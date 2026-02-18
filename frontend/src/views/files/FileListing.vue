@@ -140,7 +140,36 @@
         <span>{{ t("files.loading") }}</span>
       </h2>
     </div>
+
     <template v-else>
+      <!-- Mobile size controls: small (3 cols), medium (2 cols), large (1 col) -->
+      <div
+        v-if="isMobile && authStore.user?.viewMode === 'mosaic gallery'"
+        class="view-size-controls"
+      >
+        <button
+          :class="{ active: sizeMode === 'small' }"
+          :title="t('files.viewSizeSmall')"
+          @click="setSize('small')"
+        >
+          3
+        </button>
+        <button
+          :class="{ active: sizeMode === 'medium' }"
+          :title="t('files.viewSizeMedium')"
+          @click="setSize('medium')"
+        >
+          2
+        </button>
+        <button
+          :class="{ active: sizeMode === 'large' }"
+          :title="t('files.viewSizeLarge')"
+          @click="setSize('large')"
+        >
+          ⤢
+        </button>
+      </div>
+
       <div
         v-if="
           (fileStore.req?.numDirs ?? 0) + (fileStore.req?.numFiles ?? 0) == 0
@@ -166,13 +195,14 @@
           @change="uploadInput($event)"
         >
       </div>
+
       <div
         v-else
         id="listing"
         ref="listing"
         class="file-icons"
         data-clear-on-click="true"
-        :class="authStore.user?.viewMode ?? ''"
+        :class="[authStore.user?.viewMode ?? '', (isMobile && authStore.user?.viewMode === 'mosaic gallery') ? sizeMode : '']"
         @click="handleEmptyAreaClick"
       >
         <div>
@@ -225,6 +255,7 @@
         >
           {{ t("files.folders") }}
         </h2>
+        
         <div
           v-if="fileStore.req?.numDirs ?? false"
           data-clear-on-click="true"
@@ -244,29 +275,36 @@
           />
         </div>
 
-        <h2
-          v-if="fileStore.req?.numFiles ?? false"
-          data-clear-on-click="true"
-        >
-          {{ t("files.files") }}
-        </h2>
         <div
           v-if="fileStore.req?.numFiles ?? false"
           data-clear-on-click="true"
           @contextmenu="showContextMenu"
         >
-          <item
-            v-for="item in files"
-            :key="base64(item.name)"
-            :index="item.index"
-            :name="item.name"
-            :is-dir="item.isDir"
-            :url="item.url"
-            :modified="item.modified"
-            :type="item.type"
-            :size="item.size"
-            :path="item.path"
-          />
+          <template
+            v-for="(group, ext) in groupedFiles"
+            :key="ext"
+          >
+            <h2
+              data-clear-on-click="true"
+              class="file-group-header"
+            >
+              {{ extLabel(ext) }}
+            </h2>
+            <div class="file_group">
+              <item
+                v-for="item in group"
+                :key="base64(item.name)"
+                :index="item.index"
+                :name="item.name"
+                :is-dir="item.isDir"
+                :url="item.url"
+                :modified="item.modified"
+                :type="item.type"
+                :size="item.size"
+                :path="item.path"
+              />
+            </div>
+          </template>
         </div>
         <context-menu
           :show="isContextMenuVisible"
@@ -455,6 +493,121 @@ const files = computed((): Resource[] => {
 
   return items.value.files.slice(0, _showLimit);
 });
+
+// Size mode for mobile: 'small' = 3 columns, 'medium' = 2, 'large' = 1
+const sizeMode = ref<'small' | 'medium' | 'large'>('large');
+
+const setSize = (s: 'small' | 'medium' | 'large') => {
+  sizeMode.value = s;
+  nextTick(() => {
+    columnsResize();
+    setItemWeight();
+    fillWindow();
+  });
+};
+
+const getExt = (name: string) => {
+  const idx = name.lastIndexOf(".");
+  if (idx === -1) return "";
+  return name.slice(idx).toLowerCase();
+};
+
+// Categorize files into groups: videos, images, audio, docs, compressed, others
+const groupedFiles = computed(() => {
+  const categories: Record<string, string[]> = {
+    videos: [
+      ".mp4",
+      ".mov",
+      ".mkv",
+      ".webm",
+      ".avi",
+      ".flv",
+      ".wmv",
+    ],
+    images: [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".webp",
+      ".bmp",
+      ".tiff",
+    ],
+    audio: [".mp3", ".wav", ".ogg", ".m4a", ".flac"],
+    docs: [
+      ".pdf",
+      ".doc",
+      ".docx",
+      ".xls",
+      ".xlsx",
+      ".ppt",
+      ".pptx",
+      ".txt",
+      ".md",
+    ],
+    compressed: [
+      ".zip",
+      ".rar",
+      ".7z",
+      ".tar",
+      ".gz",
+      ".tgz",
+    ],
+  };
+
+  const groups: Record<string, Resource[]> = {
+    videos: [],
+    images: [],
+    audio: [],
+    docs: [],
+    compressed: [],
+    others: [],
+  };
+
+  for (const f of files.value) {
+    const ext = getExt(f.name);
+    let placed = false;
+
+    for (const cat of Object.keys(categories)) {
+      if (categories[cat].includes(ext)) {
+        groups[cat].push(f);
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) groups.others.push(f);
+  }
+
+  // Keep defined order: videos, images, audio, docs, compressed, others
+  const ordered: Record<string, Resource[]> = {};
+  ["videos", "images", "audio", "docs", "compressed", "others"].forEach(
+    (k) => {
+      if (groups[k] && groups[k].length > 0) ordered[k] = groups[k];
+    }
+  );
+
+  return ordered;
+});
+
+const extLabel = (key: string) => {
+  const defaults: Record<string, string> = {
+    videos: "Videos",
+    images: "Images",
+    audio: "Audio",
+    docs: "Documents",
+    compressed: "Compressed",
+    others: "Others",
+  };
+
+  // Try translation first; if translation returns the key-like string, fall back to defaults
+  const translated = t(`files.ext.${key}`);
+  if (typeof translated === "string" && !translated.includes("files.ext")) {
+    return translated;
+  }
+
+  return defaults[key] ?? key;
+};
 
 const nameIcon = computed(() => {
   if (nameSorted.value && !ascOrdered.value) {
@@ -739,6 +892,14 @@ const columnsResize = () => {
   let columns = Math.floor(
     (document.querySelector("main")?.offsetWidth ?? 0) / columnWidth.value
   );
+
+  // If on mobile and a size mode is set, respect it: small=3, medium=2, large=1
+  if (isMobile.value) {
+    if (sizeMode.value === "small") columns = 3;
+    else if (sizeMode.value === "medium") columns = 2;
+    else columns = 1;
+  }
+
   if (columns === 0) columns = 1;
   items_.style.width = `calc(${100 / columns}% - 1em)`;
 };
@@ -1096,5 +1257,188 @@ const handleEmptyAreaClick = (e: MouseEvent) => {
 
 .file-selection-margin-bottom {
   margin-bottom: 3.5rem;
+}
+
+.file_group {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.view-size-controls {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  justify-content: flex-end;
+}
+.view-size-controls button {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  color: inherit;
+}
+.view-size-controls button.active {
+  background: rgba(0,0,0,0.06);
+}
+
+/* Small: 3 columns */
+#listing.small .item,
+#listing.size-small .item {
+  width: calc(33.333% - 1em) !important;
+}
+
+/* Medium: 2 columns */
+#listing.medium .item,
+#listing.size-medium .item {
+  width: calc(50% - 1em) !important;
+}
+
+/* Large: single column (full width) */
+#listing.large .item,
+#listing.size-large .item {
+  width: calc(100% - 1em) !important;
+}
+
+.file-group-header {
+  display: block;
+  width: 100%;
+  clear: both;
+  margin: 0.75rem 0 0.25rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--fg-muted, rgba(0,0,0,0.6));
+}
+
+/* Normalize folder and file item sizing and spacing */
+#listing .item {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  margin: 0 0 0.75rem 0;
+  min-height: 4.5rem;
+}
+
+#listing .item > div:first-child {
+  width: 4.5rem;
+  height: 4.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#listing .item img {
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+#listing .item .material-icons {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+/* Center material icons by centering their container and keeping glyph width auto */
+#listing .item > div:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#listing .item .material-icons {
+  display: inline-block !important;
+  width: auto !important;
+  margin: 0 !important;
+  text-align: center !important;
+  line-height: normal !important;
+  vertical-align: middle !important;
+}
+
+#listing .item .material-icons::before {
+  display: inline-block !important;
+  width: auto !important;
+  text-align: center !important;
+  line-height: normal !important;
+}
+
+/* Ensure text content area can wrap and keeps consistent spacing */
+#listing .item > div:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* When in small mode (mobile), stack icon above text and center-align */
+#listing.small .item,
+#listing.size-small .item {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem;
+  min-height: unset;
+}
+
+#listing.small .item > div:first-child,
+#listing.size-small .item > div:first-child {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+#listing.small .item .material-icons,
+#listing.size-small .item .material-icons {
+  font-size: 1.8rem;
+}
+
+#listing.small .item .material-icons::before,
+#listing.size-small .item .material-icons::before {
+  font-size: 1.8rem !important;
+  display: block !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+#listing.small .item > div:last-child,
+#listing.size-small .item > div:last-child {
+  width: 100%;
+}
+
+/* Strong center alignment for icons and thumbnails in small mode */
+#listing.small .item > div:first-child,
+#listing.size-small .item > div:first-child {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  float: none !important;
+  text-align: center !important;
+}
+
+#listing.small .item .material-icons,
+#listing.size-small .item .material-icons {
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+#listing.small .item img,
+#listing.size-small .item img {
+  margin: 0 auto !important;
+}
+
+/* Ensure the material-icons pseudo-element is centered */
+#listing.small .item .material-icons,
+#listing.size-small .item .material-icons {
+  text-align: center !important;
+}
+
+#listing.small .item .material-icons::before,
+#listing.size-small .item .material-icons::before {
+  display: inline-block !important;
+  width: 100% !important;
+  text-align: center !important;
+  line-height: 3.5rem !important;
+  vertical-align: middle !important;
 }
 </style>

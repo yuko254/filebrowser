@@ -337,11 +337,7 @@ const handleSingleClick = (event: Event | KeyboardEvent) => {
 };
 
 const open = () => {
-  if (props.isDir) {
     router.push({ path: props.url });
-  } else {
-    window.open(props.url, "_blank");
-  }
 };
 
 const getExtension = (fileName: string): string => {
