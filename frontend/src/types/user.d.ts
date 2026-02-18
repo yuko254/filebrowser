@@ -6,6 +6,7 @@ interface IUser {
   locale: string;
   perm: Permissions;
   commands: string[];
+  shortcuts?: { name: string; path: string; system?: boolean }[];
   rules: IRule[];
   lockPassword: boolean;
   hideDotfiles: boolean;

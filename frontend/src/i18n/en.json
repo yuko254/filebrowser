@@ -48,7 +48,8 @@
     "saveChanges": "Save changes",
     "editAsText": "Edit as Text",
     "increaseFontSize": "Increase font size",
-    "decreaseFontSize": "Decrease font size"
+    "decreaseFontSize": "Decrease font size",
+    "add": "Add"
   },
   "download": {
     "downloadFile": "Download File",
@@ -124,6 +125,9 @@
   },
   "permanent": "Permanent",
   "prompts": {
+    "addPath": "Add path",
+    "addPathMessage": "Browse and choose a path to add to 'My files'.",
+    "name": "Name",
     "copy": "Copy",
     "copyMessage": "Choose the location to copy your files to:",
     "currentlyNavigating": "Currently navigating on:",
@@ -162,6 +166,18 @@
     "optionalPassword": "Optional password",
     "resolution": "Resolution",
     "discardEditorChanges": "Are you sure you wish to discard the changes you've made?"
+    ,"confirmDeleteShortcut": "Are you sure you wish to remove this shortcut from 'My files'?"
+  },
+  "sidebar": {
+    "addPath": "Add path",
+    "myFiles": "My files",
+    "settings": "Settings",
+    "help": "Help",
+    "newFolder": "New Folder",
+    "newFile": "New File",
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Signup"
   },
   "search": {
     "images": "Images",

@@ -20,16 +20,31 @@ import (
 	fberrors "github.com/filebrowser/filebrowser/v2/errors"
 	"github.com/filebrowser/filebrowser/v2/files"
 	"github.com/filebrowser/filebrowser/v2/fileutils"
+	"github.com/filebrowser/filebrowser/v2/rules"
 )
 
+// allowAllChecker allows any path (used for admin system browsing)
+type allowAllChecker struct{}
+
+func (allowAllChecker) Check(_ string) bool { return true }
+
 var resourceGetHandler = withUser(func(w http.ResponseWriter, r *http.Request, d *data) (int, error) {
+	// Allow admins to browse the real server filesystem by passing ?system=true
+	fs := d.user.Fs
+	checker := rules.Checker(d)
+
+	if r.URL.Query().Get("system") == "true" && d.user.Perm.Admin {
+		fs = afero.NewOsFs()
+		checker = allowAllChecker{}
+	}
+
 	file, err := files.NewFileInfo(&files.FileOptions{
-		Fs:         d.user.Fs,
+		Fs:         fs,
 		Path:       r.URL.Path,
 		Modify:     d.user.Perm.Modify,
 		Expand:     true,
 		ReadHeader: d.server.TypeDetectionByHeader,
-		Checker:    d,
+		Checker:    checker,
 		Content:    true,
 	})
 	if err != nil {
@@ -46,7 +61,7 @@ var resourceGetHandler = withUser(func(w http.ResponseWriter, r *http.Request, d
 			return http.StatusUnsupportedMediaType, fmt.Errorf("file is not a text file")
 		}
 
-		f, err := d.user.Fs.Open(r.URL.Path)
+		f, err := fs.Open(r.URL.Path)
 		if err != nil {
 			return errToStatus(err), err
 		}

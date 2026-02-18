@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -27,11 +27,20 @@ func (s *Settings) MakeUserDir(username, userScope, serverRoot string) (string, 
 			log.Printf("create user: invalid user for home dir creation: [%s]", username)
 			return "", errors.New("invalid user for home dir creation")
 		}
-		userScope = path.Join(s.UserHomeBasePath, username)
+		userScope = filepath.Join(s.UserHomeBasePath, username)
 	}
 
-	userScope = path.Join("/", userScope)
+	// If an absolute path is provided, create it directly on the OS filesystem.
+	if filepath.IsAbs(userScope) {
+		fs := afero.NewOsFs()
+		if err := fs.MkdirAll(userScope, os.ModePerm); err != nil {
+			return "", fmt.Errorf("failed to create user home dir: [%s]: %w", userScope, err)
+		}
+		return userScope, nil
+	}
 
+	// For relative scopes, create the directory under the configured server root.
+	userScope = filepath.Clean(userScope)
 	fs := afero.NewBasePathFs(afero.NewOsFs(), serverRoot)
 	if err := fs.MkdirAll(userScope, os.ModePerm); err != nil {
 		return "", fmt.Errorf("failed to create user home dir: [%s]: %w", userScope, err)

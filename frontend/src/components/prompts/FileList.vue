@@ -12,6 +12,7 @@
         :key="item.name"
         v-for="item in items"
         :data-url="item.url"
+        :data-isdir="item.isDir"
       >
         {{ item.name }}
       </li>
@@ -41,6 +42,18 @@ export default {
       type: Array,
       default: () => [],
     },
+    onlyDirs: {
+      type: Boolean,
+      default: false,
+    },
+    system: {
+      type: Boolean,
+      default: false,
+    },
+    initialFromStore: {
+      type: Boolean,
+      default: true,
+    },
   },
   data: function () {
     return {
@@ -52,6 +65,7 @@ export default {
       selected: null,
       current: window.location.pathname,
       nextAbortController: new AbortController(),
+      isSystem: false,
     };
   },
   inject: ["$showError"],
@@ -63,7 +77,9 @@ export default {
     },
   },
   mounted() {
-    this.fillOptions(this.req);
+    if (this.initialFromStore) {
+      this.fillOptions(this.req);
+    }
   },
   unmounted() {
     this.abortOngoingNext();
@@ -81,15 +97,33 @@ export default {
 
       this.$emit("update:selected", this.current);
 
-      // If the path isn't the root path,
-      // show a button to navigate to the previous
-      // directory.
-      if (req.url !== "/files/") {
-        this.items.push({
-          name: "..",
-          url: url.removeLastDir(req.url) + "/",
-        });
+      // If the path isn't the root path, show a button to navigate to the previous directory.
+      // Prefer using the underlying resource `path` when present (used for system browsing).
+      const isSystem = !!req.system;
+      if (isSystem) {
+        this.isSystem = true;
+        const curPath = req.path || "/";
+        if (curPath !== "/") {
+          // compute parent underlying path and map it to a files URL
+          const parent = url.removeLastDir(curPath);
+          let parentUrl = `/files${parent}`;
+          if (!parentUrl.endsWith("/")) parentUrl += "/";
+          // append system query so backend serves OS FS
+          parentUrl = parentUrl + (parentUrl.includes("?") ? "&system=true" : "?system=true");
+          this.items.push({ name: "..", url: parentUrl, isDir: true, system: true });
+        }
+      } else {
+        this.isSystem = false;
+        if (req.url !== "/files/") {
+          this.items.push({
+            name: "..",
+            url: url.removeLastDir(req.url) + "/",
+          });
+        }
       }
+
+      // track system browsing mode
+      this.isSystem = !!req.system;
 
       // If this folder is empty, finish here.
       if (req.items === null) return;
@@ -97,12 +131,14 @@ export default {
       // Otherwise we add every directory to the
       // move options.
       for (const item of req.items) {
-        if (!item.isDir) continue;
+        if (this.onlyDirs && !item.isDir) continue;
         if (this.exclude?.includes(item.url)) continue;
 
         this.items.push({
           name: item.name,
           url: item.url,
+          isDir: item.isDir,
+          system: !!item.system || false,
         });
       }
     },
@@ -111,10 +147,18 @@ export default {
       // just clicked in and fill the options with its
       // content.
       const uri = event.currentTarget.dataset.url;
+      const isDir = event.currentTarget.dataset.isdir === "true";
+      if (!isDir) return; // only navigate into directories
       this.abortOngoingNext();
       this.nextAbortController = new AbortController();
+      let fetchUri = uri;
+      // if this listing was returned as system browse, append query as a query param (not part of path)
+      if (this.isSystem || this.system) {
+        fetchUri = uri + (uri.includes("?") ? "&system=true" : "?system=true");
+      }
+
       files
-        .fetch(uri, this.nextAbortController.signal)
+        .fetch(fetchUri, this.nextAbortController.signal)
         .then(this.fillOptions)
         .catch((e) => {
           if (e instanceof StatusError && e.is_canceled) {

@@ -35,6 +35,7 @@ type userInfo struct {
 	DateFormat            bool              `json:"dateFormat"`
 	Username              string            `json:"username"`
 	AceEditorTheme        string            `json:"aceEditorTheme"`
+	Shortcuts             []users.Shortcut  `json:"shortcuts,omitempty"`
 }
 
 type authToken struct {
@@ -217,6 +218,7 @@ func printToken(w http.ResponseWriter, _ *http.Request, d *data, user *users.Use
 			DateFormat:            user.DateFormat,
 			Username:              user.Username,
 			AceEditorTheme:        user.AceEditorTheme,
+			Shortcuts:             user.Shortcuts,
 		},
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

@@ -154,6 +154,10 @@ const fetchData = async () => {
   let url = route.path;
   if (url === "") url = "/";
   if (url[0] !== "/") url = "/" + url;
+  // include system query param when present so backend can serve OS filesystem
+  if (route.query && route.query.system) {
+    url = url + `?system=${route.query.system}`;
+  }
   // Cancel the ongoing request
   fetchDataController.abort();
   fetchDataController = new AbortController();

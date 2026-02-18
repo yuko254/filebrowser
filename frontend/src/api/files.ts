@@ -7,7 +7,13 @@ import { isEncodableResponse, makeRawResource } from "@/utils/encodings";
 
 export async function fetch(url: string, signal?: AbortSignal) {
   const encoding = isEncodableResponse(url);
-  url = removePrefix(url);
+  // separate path and query (we may receive /files/?system=true)
+  const raw = url;
+  const qidx = raw.indexOf("?");
+  const pathOnly = qidx === -1 ? raw : raw.slice(0, qidx);
+  const query = qidx === -1 ? "" : raw.slice(qidx + 1);
+
+  url = removePrefix(pathOnly);
   const res = await fetchURL(`/api/resources${url}`, {
     signal,
     headers: {
@@ -30,10 +36,13 @@ export async function fetch(url: string, signal?: AbortSignal) {
     throw e;
   }
   data.url = `/files${url}`;
+  // preserve whether this resource was requested with system=true
+  (data as any).system = query.includes("system=true");
 
   if (data.isDir) {
     if (!data.url.endsWith("/")) data.url += "/";
-    // Perhaps change the any
+    // Build item urls without query; store system flag separately
+    const isSystem = (data as any).system === true;
     data.items = data.items.map((item: any, index: any) => {
       item.index = index;
       item.url = `${data.url}${encodeURIComponent(item.name)}`;
@@ -42,6 +51,8 @@ export async function fetch(url: string, signal?: AbortSignal) {
         item.url += "/";
       }
 
+      // do not include query in item.url; let caller add ?system=true when needed
+      item.system = isSystem;
       return item;
     });
   }
