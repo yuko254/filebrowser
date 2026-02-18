@@ -24,7 +24,7 @@
   >
     <div>
       <img
-        v-if="!readOnly && type === 'image' && isThumbsEnabled"
+        v-if="!readOnly && (type === 'image' || type === 'video') && isThumbsEnabled"
         v-lazy="thumbnailUrl"
       />
       <i v-else class="material-icons"></i>
@@ -255,15 +255,24 @@ const click = (event: Event | KeyboardEvent) => {
   if (!singleClick.value && fileStore.selectedCount !== 0)
     event.preventDefault();
 
-  setTimeout(() => {
-    touches.value = 0;
-  }, 300);
-
   touches.value++;
-  if (touches.value > 1) {
-    open();
-  }
 
+  setTimeout(() => {
+    if (touches.value === 1) {
+      // 单击逻辑
+      handleSingleClick(event);
+    } else if (touches.value === 2) {
+      // 300ms 内没有第三次点击，执行双击
+      open();
+    } else if (touches.value === 3) {
+      // 400ms 内进行了三次点击，执行三连击逻辑
+      router.push({ path: props.url });
+    }
+    touches.value = 0; // 归零，防止误触
+  }, 300);
+};
+
+const handleSingleClick = (event: Event | KeyboardEvent) => {
   if (fileStore.selected.indexOf(props.index) !== -1) {
     if (
       (event as KeyboardEvent).ctrlKey ||
@@ -308,9 +317,15 @@ const click = (event: Event | KeyboardEvent) => {
   fileStore.selected.push(props.index);
 };
 
+
 const open = () => {
-  router.push({ path: props.url });
+  if (props.isDir) {
+    router.push({ path: props.url });
+  } else {
+    window.open(props.url, "_blank");
+  }
 };
+
 
 const getExtension = (fileName: string): string => {
   const lastDotIndex = fileName.lastIndexOf(".");
