@@ -76,11 +76,11 @@ var sem = make(chan int, 3)
 func handleVideoPreview(
 	w http.ResponseWriter,
 	r *http.Request,
-	imgSvc ImgService,
+	_ ImgService,
 	fileCache FileCache,
 	file *files.FileInfo,
 	previewSize PreviewSize,
-	enableThumbnails, resizePreview bool,
+	_, _ bool,
 ) (int, error) {
 	path := afero.FullBaseFsPath(file.Fs.(*afero.BasePathFs), file.Path)
 
@@ -91,7 +91,7 @@ func handleVideoPreview(
 	}
 	if !ok {
 		sem <- 1
-		//cmd := exec.Command("ffmpeg", "-y", "-i", path, "-vf", "thumbnail,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=128:128", "-qscale:v", "25", "-frames:v", "1", tmp.Name())
+		// cmd := exec.Command("ffmpeg", "-y", "-i", path, "-vf", "thumbnail,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=128:128", "-qscale:v", "25", "-frames:v", "1", tmp.Name())
 		stdout, err := exec.Command("ffmpeg", "-y", "-i", path, "-vf", "thumbnail,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=128:128", "-quality", "40", "-frames:v", "1", "-c:v", "webp", "-f", "image2pipe", "-").Output()
 		<- sem
 		if err != nil {
@@ -110,7 +110,7 @@ func handleVideoPreview(
 	}
 
 	w.Header().Set("Cache-Control", "private")
-	//w.Header().Set("Content-Type", "image/jpeg")
+	// w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Type", "image/webp")
 	http.ServeContent(w, r, "", file.ModTime, bytes.NewReader(resizedImage))
 	return 0, nil
