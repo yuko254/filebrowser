@@ -1,13 +1,22 @@
 <template>
-  <errors v-if="error" :errorCode="error.status" />
-  <div class="row" v-else-if="!layoutStore.loading">
+  <errors
+    v-if="error"
+    :error-code="error.status"
+  />
+  <div
+    v-else-if="!layoutStore.loading"
+    class="row"
+  >
     <div class="column">
       <div class="card">
         <div class="card-title">
           <h2>{{ t("settings.shareManagement") }}</h2>
         </div>
 
-        <div class="card-content full" v-if="links.length > 0">
+        <div
+          v-if="links.length > 0"
+          class="card-content full"
+        >
           <table>
             <tr>
               <th>{{ t("settings.path") }}</th>
@@ -15,27 +24,39 @@
               <th v-if="authStore.user?.perm.admin">
                 {{ t("settings.username") }}
               </th>
-              <th></th>
-              <th></th>
+              <th />
+              <th />
             </tr>
 
-            <tr v-for="link in links" :key="link.hash">
+            <tr
+              v-for="link in links"
+              :key="link.hash"
+            >
               <td>
-                <a :href="buildLink(link)" target="_blank">{{ link.path }}</a>
+                <a
+                  :href="buildLink(link)"
+                  target="_blank"
+                >{{ link.path }}</a>
               </td>
               <td>
-                <template v-if="link.expire !== 0">{{
-                  humanTime(link.expire)
-                }}</template>
-                <template v-else>{{ t("permanent") }}</template>
+                <template v-if="link.expire !== 0">
+                  {{
+                    humanTime(link.expire)
+                  }}
+                </template>
+                <template v-else>
+                  {{ t("permanent") }}
+                </template>
               </td>
-              <td v-if="authStore.user?.perm.admin">{{ link.username }}</td>
+              <td v-if="authStore.user?.perm.admin">
+                {{ link.username }}
+              </td>
               <td class="small">
                 <button
                   class="action"
-                  @click="deleteLink($event, link)"
                   :aria-label="t('buttons.delete')"
                   :title="t('buttons.delete')"
+                  @click="deleteLink($event, link)"
                 >
                   <i class="material-icons">delete</i>
                 </button>
@@ -53,7 +74,10 @@
             </tr>
           </table>
         </div>
-        <h2 class="message" v-else>
+        <h2
+          v-else
+          class="message"
+        >
           <i class="material-icons">sentiment_dissatisfied</i>
           <span>{{ t("files.lonely") }}</span>
         </h2>

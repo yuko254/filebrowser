@@ -3,64 +3,75 @@
     <p v-if="!isDefault && props.user !== null">
       <label for="username">{{ t("settings.username") }}</label>
       <input
+        id="username"
+        v-model="user.username"
         class="input input--block"
         type="text"
-        v-model="user.username"
-        id="username"
-      />
+      >
     </p>
 
     <p v-if="!isDefault">
       <label for="password">{{ t("settings.password") }}</label>
       <input
+        id="password"
+        v-model="user.password"
         class="input input--block"
         type="password"
         :placeholder="passwordPlaceholder"
-        v-model="user.password"
-        id="password"
-      />
+      >
     </p>
 
     <p>
       <label for="scope">{{ t("settings.scope") }}</label>
       <input
+        id="scope"
+        v-model="user.scope"
         :disabled="createUserDirData ?? false"
         :placeholder="scopePlaceholder"
         class="input input--block"
         type="text"
-        v-model="user.scope"
-        id="scope"
-      />
+      >
     </p>
-    <p class="small" v-if="displayHomeDirectoryCheckbox">
-      <input type="checkbox" v-model="createUserDirData" />
+    <p
+      v-if="displayHomeDirectoryCheckbox"
+      class="small"
+    >
+      <input
+        v-model="createUserDirData"
+        type="checkbox"
+      >
       {{ t("settings.createUserHomeDirectory") }}
     </p>
 
     <p>
       <label for="locale">{{ t("settings.language") }}</label>
       <languages
-        class="input input--block"
         id="locale"
         v-model:locale="user.locale"
-      ></languages>
+        class="input input--block"
+      />
     </p>
 
     <p v-if="!isDefault && user.perm">
       <input
+        v-model="user.lockPassword"
         type="checkbox"
         :disabled="user.perm.admin"
-        v-model="user.lockPassword"
-      />
+      >
       {{ t("settings.lockPassword") }}
     </p>
 
     <permissions v-model:perm="user.perm" />
-    <commands v-if="enableExec" v-model:commands="user.commands" />
+    <commands
+      v-if="enableExec"
+      v-model:commands="user.commands"
+    />
 
     <div v-if="!isDefault">
       <h3>{{ t("settings.rules") }}</h3>
-      <p class="small">{{ t("settings.rulesHelp") }}</p>
+      <p class="small">
+        {{ t("settings.rulesHelp") }}
+      </p>
       <rules v-model:rules="user.rules" />
     </div>
   </div>

@@ -2,19 +2,25 @@
   <div>
     <header-bar
       v-if="error || fileStore.req?.type === undefined"
-      showMenu
-      showLogo
+      show-menu
+      show-logo
     />
 
     <breadcrumbs base="/files" />
-    <errors v-if="error" :errorCode="error.status" />
-    <component v-else-if="currentView" :is="currentView"></component>
+    <errors
+      v-if="error"
+      :error-code="error.status"
+    />
+    <component
+      :is="currentView"
+      v-else-if="currentView"
+    />
     <div v-else>
       <h2 class="message delayed">
         <div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
+          <div class="bounce1" />
+          <div class="bounce2" />
+          <div class="bounce3" />
         </div>
         <span>{{ t("files.loading") }}</span>
       </h2>

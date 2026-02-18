@@ -2,16 +2,24 @@
   <div
     class="shell"
     :class="{ ['shell--hidden']: !showShell }"
-    :style="{ height: `${this.shellHeight}em`, direction: 'ltr' }"
+    :style="{ height: `${shellHeight}em`, direction: 'ltr' }"
   >
     <div
+      class="shell__divider"
+      :style="shellDrag ? { background: `${checkTheme()}` } : ''"
       @pointerdown="startDrag()"
       @pointerup="stopDrag()"
-      class="shell__divider"
-      :style="this.shellDrag ? { background: `${checkTheme()}` } : ''"
-    ></div>
-    <div @click="focus" class="shell__content" ref="scrollable">
-      <div v-for="(c, index) in content" :key="index" class="shell__result">
+    />
+    <div
+      ref="scrollable"
+      class="shell__content"
+      @click="focus"
+    >
+      <div
+        v-for="(c, index) in content"
+        :key="index"
+        class="shell__result"
+      >
         <div class="shell__prompt">
           <i class="material-icons">chevron_right</i>
         </div>
@@ -26,8 +34,8 @@
           <i class="material-icons">chevron_right</i>
         </div>
         <pre
-          tabindex="0"
           ref="input"
+          tabindex="0"
           class="shell__text"
           :contenteditable="true"
           @keydown.prevent.arrow-up="historyUp"
@@ -37,10 +45,10 @@
       </div>
     </div>
     <div
-      @pointerup="stopDrag()"
+      v-show="shellDrag"
       class="shell__overlay"
-      v-show="this.shellDrag"
-    ></div>
+      @pointerup="stopDrag()"
+    />
   </div>
 </template>
 
@@ -54,7 +62,7 @@ import { throttle } from "lodash-es";
 import { theme } from "@/utils/constants";
 
 export default {
-  name: "shell",
+  name: "Shell",
   computed: {
     ...mapState(useLayoutStore, ["showShell"]),
     ...mapState(useFileStore, ["isFiles"]),
@@ -181,6 +189,7 @@ export default {
         () => {
           results.text = results.text
 
+            // eslint-disable-next-line no-control-regex
             .replace(/\u001b\[[0-9;]+m/g, "") // Filter ANSI color for now
             .trimEnd();
           this.canInput = true;

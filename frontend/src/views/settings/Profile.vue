@@ -1,44 +1,59 @@
 <template>
   <div class="row">
     <div class="column">
-      <form class="card" @submit="updateSettings">
+      <form
+        class="card"
+        @submit="updateSettings"
+      >
         <div class="card-title">
           <h2>{{ t("settings.profileSettings") }}</h2>
         </div>
 
         <div class="card-content">
           <p>
-            <input type="checkbox" name="hideDotfiles" v-model="hideDotfiles" />
+            <input
+              v-model="hideDotfiles"
+              type="checkbox"
+              name="hideDotfiles"
+            >
             {{ t("settings.hideDotfiles") }}
           </p>
           <p>
-            <input type="checkbox" name="singleClick" v-model="singleClick" />
+            <input
+              v-model="singleClick"
+              type="checkbox"
+              name="singleClick"
+            >
             {{ t("settings.singleClick") }}
           </p>
           <p>
             <input
+              v-model="redirectAfterCopyMove"
               type="checkbox"
               name="redirectAfterCopyMove"
-              v-model="redirectAfterCopyMove"
-            />
+            >
             {{ t("settings.redirectAfterCopyMove") }}
           </p>
           <p>
-            <input type="checkbox" name="dateFormat" v-model="dateFormat" />
+            <input
+              v-model="dateFormat"
+              type="checkbox"
+              name="dateFormat"
+            >
             {{ t("settings.setDateFormat") }}
           </p>
           <h3>{{ t("settings.language") }}</h3>
           <languages
-            class="input input--block"
             v-model:locale="locale"
-          ></languages>
+            class="input input--block"
+          />
 
           <h3>{{ t("settings.aceEditorTheme") }}</h3>
           <AceEditorTheme
-            class="input input--block"
-            v-model:aceEditorTheme="aceEditorTheme"
             id="aceTheme"
-          ></AceEditorTheme>
+            v-model:ace-editor-theme="aceEditorTheme"
+            class="input input--block"
+          />
         </div>
 
         <div class="card-action">
@@ -47,15 +62,18 @@
             type="submit"
             name="submitProfile"
             :value="t('buttons.update')"
-          />
+          >
         </div>
       </form>
     </div>
 
-    <div v-if="!noAuth" class="column">
+    <div
+      v-if="!noAuth"
+      class="column"
+    >
       <form
-        class="card"
         v-if="!authStore.user?.lockPassword"
+        class="card"
         @submit="updatePassword"
       >
         <div class="card-title">
@@ -64,28 +82,28 @@
 
         <div class="card-content">
           <input
+            v-model="password"
             :class="passwordClass"
             type="password"
             :placeholder="t('settings.newPassword')"
-            v-model="password"
             name="password"
-          />
+          >
           <input
+            v-model="passwordConf"
             :class="passwordClass"
             type="password"
             :placeholder="t('settings.newPasswordConfirm')"
-            v-model="passwordConf"
             name="passwordConf"
-          />
+          >
           <input
             v-if="isCurrentPasswordRequired"
+            v-model="currentPassword"
             :class="passwordClass"
             type="password"
             :placeholder="t('settings.currentPassword')"
-            v-model="currentPassword"
             name="current_password"
             autocomplete="current-password"
-          />
+          >
         </div>
 
         <div class="card-action">
@@ -94,7 +112,7 @@
             type="submit"
             name="submitPassword"
             :value="t('buttons.update')"
-          />
+          >
         </div>
       </form>
     </div>

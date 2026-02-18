@@ -1,43 +1,63 @@
 <template>
-  <div id="login" :class="{ recaptcha: recaptcha }">
+  <div
+    id="login"
+    :class="{ recaptcha: recaptcha }"
+  >
     <form @submit="submit">
-      <img :src="logoURL" alt="File Browser" />
+      <img
+        :src="logoURL"
+        alt="File Browser"
+      >
       <h1>{{ name }}</h1>
-      <p v-if="reason != null" class="logout-message">
+      <p
+        v-if="reason != null"
+        class="logout-message"
+      >
         {{ t(`login.logout_reasons.${reason}`) }}
       </p>
-      <div v-if="error !== ''" class="wrong">{{ error }}</div>
+      <div
+        v-if="error !== ''"
+        class="wrong"
+      >
+        {{ error }}
+      </div>
 
       <input
+        v-model="username"
         autofocus
         class="input input--block"
         type="text"
         autocapitalize="off"
-        v-model="username"
         :placeholder="t('login.username')"
-      />
+      >
       <input
-        class="input input--block"
-        type="password"
         v-model="password"
-        :placeholder="t('login.password')"
-      />
-      <input
         class="input input--block"
-        v-if="createMode"
         type="password"
+        :placeholder="t('login.password')"
+      >
+      <input
+        v-if="createMode"
         v-model="passwordConfirm"
+        class="input input--block"
+        type="password"
         :placeholder="t('login.passwordConfirm')"
-      />
+      >
 
-      <div v-if="recaptcha" id="recaptcha"></div>
+      <div
+        v-if="recaptcha"
+        id="recaptcha"
+      />
       <input
         class="button button--block"
         type="submit"
         :value="createMode ? t('login.signup') : t('login.submit')"
-      />
+      >
 
-      <p @click="toggleMode" v-if="signup">
+      <p
+        v-if="signup"
+        @click="toggleMode"
+      >
         {{ createMode ? t("login.loginInstead") : t("login.createAnAccount") }}
       </p>
     </form>

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <header-bar showMenu showLogo>
+    <header-bar
+      show-menu
+      show-logo
+    >
       <search />
       <title />
       <action
@@ -62,17 +65,21 @@
           v-if="headerButtons.download"
           icon="file_download"
           :label="t('buttons.download')"
-          @action="download"
           :counter="fileStore.selectedCount"
+          @action="download"
         />
         <action
           v-if="headerButtons.upload"
-          icon="file_upload"
           id="upload-button"
+          icon="file_upload"
           :label="t('buttons.upload')"
           @action="uploadFunc"
         />
-        <action icon="info" :label="t('buttons.info')" show="info" />
+        <action
+          icon="info"
+          :label="t('buttons.info')"
+          show="info"
+        />
         <action
           icon="check_circle"
           :label="t('buttons.selectMultiple')"
@@ -126,9 +133,9 @@
     <div v-if="layoutStore.loading">
       <h2 class="message delayed">
         <div class="spinner">
-          <div class="bounce1"></div>
-          <div class="bounce2"></div>
-          <div class="bounce3"></div>
+          <div class="bounce1" />
+          <div class="bounce2" />
+          <div class="bounce3" />
         </div>
         <span>{{ t("files.loading") }}</span>
       </h2>
@@ -144,20 +151,20 @@
           <span>{{ t("files.lonely") }}</span>
         </h2>
         <input
-          style="display: none"
-          type="file"
           id="upload-input"
-          @change="uploadInput($event)"
-          multiple
-        />
-        <input
           style="display: none"
           type="file"
-          id="upload-folder-input"
+          multiple
           @change="uploadInput($event)"
+        >
+        <input
+          id="upload-folder-input"
+          style="display: none"
+          type="file"
           webkitdirectory
           multiple
-        />
+          @change="uploadInput($event)"
+        >
       </div>
       <div
         v-else
@@ -176,9 +183,9 @@
                 class="name"
                 role="button"
                 tabindex="0"
-                @click="sort('name')"
                 :title="t('files.sortByName')"
                 :aria-label="t('files.sortByName')"
+                @click="sort('name')"
               >
                 <span>{{ t("files.name") }}</span>
                 <i class="material-icons">{{ nameIcon }}</i>
@@ -189,9 +196,9 @@
                 class="size"
                 role="button"
                 tabindex="0"
-                @click="sort('size')"
                 :title="t('files.sortBySize')"
                 :aria-label="t('files.sortBySize')"
+                @click="sort('size')"
               >
                 <span>{{ t("files.size") }}</span>
                 <i class="material-icons">{{ sizeIcon }}</i>
@@ -201,9 +208,9 @@
                 class="modified"
                 role="button"
                 tabindex="0"
-                @click="sort('modified')"
                 :title="t('files.sortByLastModified')"
                 :aria-label="t('files.sortByLastModified')"
+                @click="sort('modified')"
               >
                 <span>{{ t("files.lastModified") }}</span>
                 <i class="material-icons">{{ modifiedIcon }}</i>
@@ -212,7 +219,10 @@
           </div>
         </div>
 
-        <h2 data-clear-on-click="true" v-if="fileStore.req?.numDirs ?? false">
+        <h2
+          v-if="fileStore.req?.numDirs ?? false"
+          data-clear-on-click="true"
+        >
           {{ t("files.folders") }}
         </h2>
         <div
@@ -223,19 +233,21 @@
           <item
             v-for="item in dirs"
             :key="base64(item.name)"
-            v-bind:index="item.index"
-            v-bind:name="item.name"
-            v-bind:isDir="item.isDir"
-            v-bind:url="item.url"
-            v-bind:modified="item.modified"
-            v-bind:type="item.type"
-            v-bind:size="item.size"
-            v-bind:path="item.path"
-          >
-          </item>
+            :index="item.index"
+            :name="item.name"
+            :is-dir="item.isDir"
+            :url="item.url"
+            :modified="item.modified"
+            :type="item.type"
+            :size="item.size"
+            :path="item.path"
+          />
         </div>
 
-        <h2 data-clear-on-click="true" v-if="fileStore.req?.numFiles ?? false">
+        <h2
+          v-if="fileStore.req?.numFiles ?? false"
+          data-clear-on-click="true"
+        >
           {{ t("files.files") }}
         </h2>
         <div
@@ -246,16 +258,15 @@
           <item
             v-for="item in files"
             :key="base64(item.name)"
-            v-bind:index="item.index"
-            v-bind:name="item.name"
-            v-bind:isDir="item.isDir"
-            v-bind:url="item.url"
-            v-bind:modified="item.modified"
-            v-bind:type="item.type"
-            v-bind:size="item.size"
-            v-bind:path="item.path"
-          >
-          </item>
+            :index="item.index"
+            :name="item.name"
+            :is-dir="item.isDir"
+            :url="item.url"
+            :modified="item.modified"
+            :type="item.type"
+            :size="item.size"
+            :path="item.path"
+          />
         </div>
         <context-menu
           :show="isContextMenuVisible"
@@ -299,37 +310,44 @@
             v-if="headerButtons.download"
             icon="file_download"
             :label="t('buttons.download')"
-            @action="download"
             :counter="fileStore.selectedCount"
+            @action="download"
           />
-          <action icon="info" :label="t('buttons.info')" show="info" />
+          <action
+            icon="info"
+            :label="t('buttons.info')"
+            show="info"
+          />
         </context-menu>
 
         <input
-          style="display: none"
-          type="file"
           id="upload-input"
-          @change="uploadInput($event)"
-          multiple
-        />
-        <input
           style="display: none"
           type="file"
-          id="upload-folder-input"
+          multiple
           @change="uploadInput($event)"
+        >
+        <input
+          id="upload-folder-input"
+          style="display: none"
+          type="file"
           webkitdirectory
           multiple
-        />
+          @change="uploadInput($event)"
+        >
 
-        <div :class="{ active: fileStore.multiple }" id="multiple-selection">
+        <div
+          id="multiple-selection"
+          :class="{ active: fileStore.multiple }"
+        >
           <p>{{ t("files.multipleSelectionEnabled") }}</p>
           <div
-            @click="() => (fileStore.multiple = false)"
             tabindex="0"
             role="button"
             :title="t('buttons.clear')"
             :aria-label="t('buttons.clear')"
             class="action"
+            @click="() => (fileStore.multiple = false)"
           >
             <i class="material-icons">clear</i>
           </div>

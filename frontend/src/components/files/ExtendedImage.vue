@@ -1,7 +1,7 @@
 <template>
   <div
-    class="image-ex-container"
     ref="container"
+    class="image-ex-container"
     @touchstart="touchStart"
     @touchmove="touchMove"
     @dblclick="zoomAuto"
@@ -10,7 +10,11 @@
     @mouseup="mouseUp"
     @wheel="wheelMove"
   >
-    <img class="image-ex-img image-ex-img-center" ref="imgex" @load="onLoad" />
+    <img
+      ref="imgex"
+      class="image-ex-img image-ex-img-center"
+      @load="onLoad"
+    >
   </div>
 </template>
 <script setup lang="ts">

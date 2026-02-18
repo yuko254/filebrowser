@@ -1,31 +1,47 @@
 <template>
   <form class="rules small">
-    <div v-for="(rule, index) in rules" :key="index">
-      <input type="checkbox" v-model="rule.regex" /><label>Regex</label>
-      <input type="checkbox" v-model="rule.allow" /><label>Allow</label>
+    <div
+      v-for="(rule, index) in rules"
+      :key="index"
+    >
+      <input
+        v-model="rule.regex"
+        type="checkbox"
+      ><label>Regex</label>
+      <input
+        v-model="rule.allow"
+        type="checkbox"
+      ><label>Allow</label>
 
       <input
-        @keypress.enter.prevent
-        type="text"
         v-if="rule.regex"
         v-model="rule.regexp.raw"
-        :placeholder="$t('settings.insertRegex')"
-      />
-      <input
-        @keypress.enter.prevent
         type="text"
+        :placeholder="$t('settings.insertRegex')"
+        @keypress.enter.prevent
+      >
+      <input
         v-else
         v-model="rule.path"
+        type="text"
         :placeholder="$t('settings.insertPath')"
-      />
+        @keypress.enter.prevent
+      >
 
-      <button class="button button--red" @click="remove($event, index)">
+      <button
+        class="button button--red"
+        @click="remove($event, index)"
+      >
         -
       </button>
     </div>
 
     <div>
-      <button class="button" @click="create" default="false">
+      <button
+        class="button"
+        default="false"
+        @click="create"
+      >
         {{ $t("buttons.new") }}
       </button>
     </div>
@@ -34,7 +50,7 @@
 
 <script>
 export default {
-  name: "rules-textarea",
+  name: "RulesTextarea",
   props: ["rules"],
   methods: {
     remove(event, index) {

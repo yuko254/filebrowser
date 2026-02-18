@@ -11,29 +11,29 @@
     <div class="card-action">
       <button
         class="button button--flat button--grey"
-        @click="closeHovers"
         :aria-label="$t('buttons.cancel')"
         :title="$t('buttons.cancel')"
         tabindex="3"
+        @click="closeHovers"
       >
         {{ $t("buttons.cancel") }}
       </button>
       <button
         class="button button--flat button--blue"
-        @click="(event) => currentPrompt.confirm(event, 'rename')"
         :aria-label="$t('buttons.rename')"
         :title="$t('buttons.rename')"
         tabindex="2"
+        @click="(event) => currentPrompt.confirm(event, 'rename')"
       >
         {{ $t("buttons.rename") }}
       </button>
       <button
         id="focus-prompt"
         class="button button--flat button--red"
-        @click="(event) => currentPrompt.confirm(event, 'overwrite')"
         :aria-label="$t('buttons.replace')"
         :title="$t('buttons.replace')"
         tabindex="1"
+        @click="(event) => currentPrompt.confirm(event, 'overwrite')"
       >
         {{ $t("buttons.replace") }}
       </button>
@@ -46,7 +46,7 @@ import { mapActions, mapState } from "pinia";
 import { useLayoutStore } from "@/stores/layout";
 
 export default {
-  name: "replace-rename",
+  name: "ReplaceRename",
   computed: {
     ...mapState(useLayoutStore, ["currentPrompt"]),
   },

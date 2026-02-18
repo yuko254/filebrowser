@@ -1,19 +1,35 @@
 <template>
-  <errors v-if="error" :errorCode="error.status" />
-  <div class="row" v-else-if="!layoutStore.loading">
+  <errors
+    v-if="error"
+    :error-code="error.status"
+  />
+  <div
+    v-else-if="!layoutStore.loading"
+    class="row"
+  >
     <div class="column">
-      <form @submit="save" class="card">
+      <form
+        class="card"
+        @submit="save"
+      >
         <div class="card-title">
-          <h2 v-if="user?.id === 0">{{ $t("settings.newUser") }}</h2>
-          <h2 v-else>{{ $t("settings.user") }} {{ user?.username }}</h2>
+          <h2 v-if="user?.id === 0">
+            {{ $t("settings.newUser") }}
+          </h2>
+          <h2 v-else>
+            {{ $t("settings.user") }} {{ user?.username }}
+          </h2>
         </div>
 
-        <div class="card-content" v-if="user">
+        <div
+          v-if="user"
+          class="card-content"
+        >
           <user-form
             v-model:user="user"
-            v-model:createUserDir="createUserDir"
-            :isDefault="false"
-            :isNew="isNew"
+            v-model:create-user-dir="createUserDir"
+            :is-default="false"
+            :is-new="isNew"
           />
 
           <p v-if="isCurrentPasswordRequired">
@@ -21,23 +37,23 @@
               t("settings.currentPassword")
             }}</label>
             <input
+              id="currentPassword"
+              v-model="currentPassword"
               class="input input--block"
               type="password"
-              v-model="currentPassword"
-              id="currentPassword"
               autocomplete="current-password"
-            />
+            >
           </p>
         </div>
 
         <div class="card-action">
           <button
             v-if="!isNew"
-            @click.prevent="deletePrompt"
             type="button"
             class="button button--flat button--red"
             :aria-label="$t('buttons.delete')"
             :title="$t('buttons.delete')"
+            @click.prevent="deletePrompt"
           >
             {{ $t("buttons.delete") }}
           </button>
@@ -54,7 +70,7 @@
             class="button button--flat"
             type="submit"
             :value="$t('buttons.save')"
-          />
+          >
         </div>
       </form>
     </div>

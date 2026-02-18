@@ -2,7 +2,7 @@
   <div
     v-if="uploadStore.activeUploads.size > 0"
     class="upload-files"
-    v-bind:class="{ closed: !open }"
+    :class="{ closed: !open }"
   >
     <div class="card floating">
       <div class="card-title">
@@ -14,9 +14,15 @@
           }}
         </h2>
         <div class="upload-info">
-          <div class="upload-speed">{{ speedText }}/s</div>
-          <div class="upload-eta">{{ formattedETA }} remaining</div>
-          <div class="upload-percentage">{{ sentPercent }}% Completed</div>
+          <div class="upload-speed">
+            {{ speedText }}/s
+          </div>
+          <div class="upload-eta">
+            {{ formattedETA }} remaining
+          </div>
+          <div class="upload-percentage">
+            {{ sentPercent }}% Completed
+          </div>
           <div class="upload-fraction">
             {{ sentMbytes }} /
             {{ totalMbytes }}
@@ -24,17 +30,17 @@
         </div>
         <button
           class="action"
-          @click="abortAll"
           aria-label="Abort upload"
           title="Abort upload"
+          @click="abortAll"
         >
           <i class="material-icons">{{ "cancel" }}</i>
         </button>
         <button
           class="action"
-          @click="toggle"
           aria-label="Toggle file upload list"
           title="Toggle file upload list"
+          @click="toggle"
         >
           <i class="material-icons">{{
             open ? "keyboard_arrow_down" : "keyboard_arrow_up"
@@ -44,22 +50,22 @@
 
       <div class="card-content file-icons">
         <div
-          class="file"
           v-for="upload in uploadStore.activeUploads"
           :key="upload.path"
+          class="file"
           :data-dir="upload.type === 'dir'"
           :data-type="upload.type"
           :aria-label="upload.name"
         >
           <div class="file-name">
-            <i class="material-icons"></i> {{ upload.name }}
+            <i class="material-icons" /> {{ upload.name }}
           </div>
           <div class="file-progress">
             <div
-              v-bind:style="{
+              :style="{
                 width: (upload.sentBytes / upload.totalBytes) * 100 + '%',
               }"
-            ></div>
+            />
           </div>
         </div>
       </div>

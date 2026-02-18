@@ -4,40 +4,46 @@ https://raw.githubusercontent.com/dzwillia/vue-simple-progress/master/src/compon
 <template>
   <div>
     <div
+      v-if="text.length > 0 && textPosition == 'top'"
       class="vue-simple-progress-text"
       :style="text_style"
-      v-if="text.length > 0 && textPosition == 'top'"
     >
       {{ text }}
     </div>
-    <div class="vue-simple-progress" :style="progress_style">
+    <div
+      class="vue-simple-progress"
+      :style="progress_style"
+    >
       <div
+        v-if="text.length > 0 && textPosition == 'middle'"
         class="vue-simple-progress-text"
         :style="text_style"
-        v-if="text.length > 0 && textPosition == 'middle'"
       >
         {{ text }}
       </div>
       <div
+        v-if="text.length > 0 && textPosition == 'inside'"
         style="position: relative; left: -9999px"
         :style="text_style"
-        v-if="text.length > 0 && textPosition == 'inside'"
       >
         {{ text }}
       </div>
-      <div class="vue-simple-progress-bar" :style="bar_style">
+      <div
+        class="vue-simple-progress-bar"
+        :style="bar_style"
+      >
         <div
-          :style="text_style"
           v-if="text.length > 0 && textPosition == 'inside'"
+          :style="text_style"
         >
           {{ text }}
         </div>
       </div>
     </div>
     <div
+      v-if="text.length > 0 && textPosition == 'bottom'"
       class="vue-simple-progress-text"
       :style="text_style"
-      v-if="text.length > 0 && textPosition == 'bottom'"
     >
       {{ text }}
     </div>
@@ -51,7 +57,7 @@ const isNumber = function (n) {
 };
 
 export default {
-  name: "progress-bar",
+  name: "ProgressBar",
   props: {
     val: {
       default: 0,
@@ -192,8 +198,8 @@ export default {
         style["position"] = "absolute";
         style["top"] = "0";
         style["height"] = "100%";
-        ((style["min-height"] = this.size_px + "px"),
-          (style["z-index"] = "-1"));
+        style["min-height"] = this.size_px + "px";
+        style["z-index"] = "-1";
       }
 
       return style;

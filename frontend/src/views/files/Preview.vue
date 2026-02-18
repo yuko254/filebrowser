@@ -7,51 +7,55 @@
     @touchstart="toggleNavigation"
   >
     <header-bar v-if="isPdf || isEpub || isCsv || showNav">
-      <action icon="close" :label="$t('buttons.close')" @action="close()" />
+      <action
+        icon="close"
+        :label="$t('buttons.close')"
+        @action="close()"
+      />
       <title>{{ name }}</title>
       <action
-        :disabled="layoutStore.loading"
         v-if="isResizeEnabled && fileStore.req?.type === 'image'"
+        :disabled="layoutStore.loading"
         :icon="fullSize ? 'photo_size_select_large' : 'hd'"
         @action="toggleSize"
       />
 
       <template #actions>
         <action
-          :disabled="layoutStore.loading"
           v-if="authStore.user?.perm.rename"
+          :disabled="layoutStore.loading"
           icon="mode_edit"
           :label="$t('buttons.rename')"
           show="rename"
         />
         <action
-          :disabled="layoutStore.loading"
           v-if="isCsv && authStore.user?.perm.modify"
+          :disabled="layoutStore.loading"
           icon="edit_note"
           :label="t('buttons.editAsText')"
           @action="editAsText"
         />
         <action
-          :disabled="layoutStore.loading"
           v-if="authStore.user?.perm.delete"
+          id="delete-button"
+          :disabled="layoutStore.loading"
           icon="delete"
           :label="$t('buttons.delete')"
           @action="deleteFile"
-          id="delete-button"
         />
         <action
-          :disabled="layoutStore.loading"
           v-if="authStore.user?.perm.download"
+          :disabled="layoutStore.loading"
           icon="file_download"
           :label="$t('buttons.download')"
           @action="download"
         />
         <action
-          :disabled="layoutStore.loading"
           v-if="
             ['image', 'audio', 'video'].includes(fileStore.req?.type || '') &&
-            authStore.user?.perm.download
+              authStore.user?.perm.download
           "
+          :disabled="layoutStore.loading"
           icon="open_in_new"
           :label="t('buttons.openDirect')"
           @action="openDirect"
@@ -65,24 +69,30 @@
       </template>
     </header-bar>
 
-    <div class="loading delayed" v-if="layoutStore.loading">
+    <div
+      v-if="layoutStore.loading"
+      class="loading delayed"
+    >
       <div class="spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
+        <div class="bounce1" />
+        <div class="bounce2" />
+        <div class="bounce3" />
       </div>
     </div>
     <template v-else>
       <div class="preview">
-        <div v-if="isEpub" class="epub-reader">
+        <div
+          v-if="isEpub"
+          class="epub-reader"
+        >
           <vue-reader
             :location="location"
             :url="previewUrl"
             :get-rendition="getRendition"
-            :epubInitOptions="{
+            :epub-init-options="{
               requestCredentials: true,
             }"
-            :epubOptions="{
+            :epub-options="{
               allowPopups: true,
               allowScriptedContent: true,
             }"
@@ -90,21 +100,25 @@
           />
           <div class="size">
             <button
-              @click="changeSize(Math.max(100, size - 10))"
               class="reader-button"
+              @click="changeSize(Math.max(100, size - 10))"
             >
               <i class="material-icons">remove</i>
             </button>
             <button
-              @click="changeSize(Math.min(150, size + 10))"
               class="reader-button"
+              @click="changeSize(Math.min(150, size + 10))"
             >
               <i class="material-icons">add</i>
             </button>
             <span>{{ size }}%</span>
           </div>
         </div>
-        <CsvViewer v-else-if="isCsv" :content="csvContent" :error="csvError" />
+        <CsvViewer
+          v-else-if="isCsv"
+          :content="csvContent"
+          :error="csvError"
+        />
         <ExtendedImage
           v-else-if="fileStore.req?.type == 'image'"
           :src="previewUrl"
@@ -116,37 +130,45 @@
           controls
           :autoplay="autoPlay"
           @play="autoPlay = true"
-        ></audio>
+        />
         <VideoPlayer
           v-else-if="fileStore.req?.type == 'video'"
           ref="player"
           :source="previewUrl"
           :subtitles="subtitles"
           :options="videoOptions"
+        />
+        <object
+          v-else-if="isPdf"
+          class="pdf"
+          :data="previewUrl"
+        />
+        <div
+          v-else-if="fileStore.req?.type == 'blob'"
+          class="info"
         >
-        </VideoPlayer>
-        <object v-else-if="isPdf" class="pdf" :data="previewUrl"></object>
-        <div v-else-if="fileStore.req?.type == 'blob'" class="info">
           <div class="title">
             <i class="material-icons">feedback</i>
             {{ $t("files.noPreview") }}
           </div>
           <div>
-            <a target="_blank" :href="downloadUrl" class="button button--flat">
+            <a
+              target="_blank"
+              :href="downloadUrl"
+              class="button button--flat"
+            >
               <div>
-                <i class="material-icons">file_download</i
-                >{{ $t("buttons.download") }}
+                <i class="material-icons">file_download</i>{{ $t("buttons.download") }}
               </div>
             </a>
             <a
+              v-if="!fileStore.req?.isDir"
               target="_blank"
               :href="previewUrl"
               class="button button--flat"
-              v-if="!fileStore.req?.isDir"
             >
               <div>
-                <i class="material-icons">open_in_new</i
-                >{{ $t("buttons.openFile") }}
+                <i class="material-icons">open_in_new</i>{{ $t("buttons.openFile") }}
               </div>
             </a>
           </div>
@@ -155,27 +177,33 @@
     </template>
 
     <button
-      @click="prev"
-      @mouseover="hoverNav = true"
-      @mouseleave="hoverNav = false"
       :class="{ hidden: !hasPrevious || !showNav }"
       :aria-label="$t('buttons.previous')"
       :title="$t('buttons.previous')"
+      @click="prev"
+      @mouseover="hoverNav = true"
+      @mouseleave="hoverNav = false"
     >
       <i class="material-icons">chevron_left</i>
     </button>
     <button
-      @click="next"
-      @mouseover="hoverNav = true"
-      @mouseleave="hoverNav = false"
       :class="{ hidden: !hasNext || !showNav }"
       :aria-label="$t('buttons.next')"
       :title="$t('buttons.next')"
+      @click="next"
+      @mouseover="hoverNav = true"
+      @mouseleave="hoverNav = false"
     >
       <i class="material-icons">chevron_right</i>
     </button>
-    <link rel="prefetch" :href="previousRaw" />
-    <link rel="prefetch" :href="nextRaw" />
+    <link
+      rel="prefetch"
+      :href="previousRaw"
+    >
+    <link
+      rel="prefetch"
+      :href="nextRaw"
+    >
   </div>
 </template>
 
@@ -473,7 +501,8 @@ const toggleNavigation = throttle(function () {
   }
 
   navTimeout.value = window.setTimeout(() => {
-    showNav.value = false || hoverNav.value;
+    if (!hoverNav.value) { showNav.value = false; }
+    else { showNav.value = hoverNav.value; }
     navTimeout.value = null;
   }, 1500);
 }, 500);

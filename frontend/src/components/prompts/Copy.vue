@@ -8,8 +8,8 @@
       <p>{{ $t("prompts.copyMessage") }}</p>
       <file-list
         ref="fileList"
-        @update:selected="(val) => (dest = val)"
         tabindex="1"
+        @update:selected="(val) => (dest = val)"
       />
     </div>
 
@@ -20,10 +20,10 @@
       <template v-if="user.perm.create">
         <button
           class="button button--flat"
-          @click="$refs.fileList.createDir()"
           :aria-label="$t('sidebar.newFolder')"
           :title="$t('sidebar.newFolder')"
           style="justify-self: left"
+          @click="$refs.fileList.createDir()"
         >
           <span>{{ $t("sidebar.newFolder") }}</span>
         </button>
@@ -31,20 +31,20 @@
       <div>
         <button
           class="button button--flat button--grey"
-          @click="closeHovers"
           :aria-label="$t('buttons.cancel')"
           :title="$t('buttons.cancel')"
           tabindex="3"
+          @click="closeHovers"
         >
           {{ $t("buttons.cancel") }}
         </button>
         <button
           id="focus-prompt"
           class="button button--flat"
-          @click="copy"
           :aria-label="$t('buttons.copy')"
           :title="$t('buttons.copy')"
           tabindex="2"
+          @click="copy"
         >
           {{ $t("buttons.copy") }}
         </button>
@@ -65,15 +65,15 @@ import * as upload from "@/utils/upload";
 import { removePrefix } from "@/api/utils";
 
 export default {
-  name: "copy",
+  name: "Copy",
   components: { FileList },
+  inject: ["$showError"],
   data: function () {
     return {
       current: window.location.pathname,
       dest: null,
     };
   },
-  inject: ["$showError"],
   computed: {
     ...mapState(useFileStore, ["req", "selected"]),
     ...mapState(useAuthStore, ["user"]),

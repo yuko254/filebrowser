@@ -10,23 +10,27 @@
 
     <div class="card-action full">
       <div
+        id="focus-prompt"
+        class="action"
+        tabindex="1"
         @click="uploadFile"
         @keypress.enter="uploadFile"
-        class="action"
-        id="focus-prompt"
-        tabindex="1"
       >
         <i class="material-icons">insert_drive_file</i>
-        <div class="title">{{ t("buttons.file") }}</div>
+        <div class="title">
+          {{ t("buttons.file") }}
+        </div>
       </div>
       <div
-        @click="uploadFolder"
-        @keypress.enter="uploadFolder"
         class="action"
         tabindex="2"
+        @click="uploadFolder"
+        @keypress.enter="uploadFolder"
       >
         <i class="material-icons">folder</i>
-        <div class="title">{{ t("buttons.folder") }}</div>
+        <div class="title">
+          {{ t("buttons.folder") }}
+        </div>
       </div>
     </div>
   </div>

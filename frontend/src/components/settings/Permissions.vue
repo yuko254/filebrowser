@@ -1,39 +1,72 @@
 <template>
   <div>
     <h3>{{ $t("settings.permissions") }}</h3>
-    <p class="small">{{ $t("settings.permissionsHelp") }}</p>
+    <p class="small">
+      {{ $t("settings.permissionsHelp") }}
+    </p>
 
     <p>
-      <input type="checkbox" v-model="admin" />
+      <input
+        v-model="admin"
+        type="checkbox"
+      >
       {{ $t("settings.administrator") }}
     </p>
 
     <p>
-      <input type="checkbox" :disabled="admin" v-model="perm.create" />
+      <input
+        v-model="perm.create"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.create") }}
     </p>
     <p>
-      <input type="checkbox" :disabled="admin" v-model="perm.delete" />
+      <input
+        v-model="perm.delete"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.delete") }}
     </p>
     <p>
-      <input type="checkbox" :disabled="admin" v-model="perm.download" />
+      <input
+        v-model="perm.download"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.download") }}
     </p>
     <p>
-      <input type="checkbox" :disabled="admin" v-model="perm.modify" />
+      <input
+        v-model="perm.modify"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.modify") }}
     </p>
     <p v-if="isExecEnabled">
-      <input type="checkbox" :disabled="admin" v-model="perm.execute" />
+      <input
+        v-model="perm.execute"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.execute") }}
     </p>
     <p>
-      <input type="checkbox" :disabled="admin" v-model="perm.rename" />
+      <input
+        v-model="perm.rename"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.rename") }}
     </p>
     <p>
-      <input type="checkbox" :disabled="admin" v-model="perm.share" />
+      <input
+        v-model="perm.share"
+        type="checkbox"
+        :disabled="admin"
+      >
       {{ $t("settings.perm.share") }}
     </p>
   </div>
@@ -42,7 +75,7 @@
 <script>
 import { enableExec } from "@/utils/constants";
 export default {
-  name: "permissions",
+  name: "Permissions",
   props: ["perm"],
   computed: {
     admin: {

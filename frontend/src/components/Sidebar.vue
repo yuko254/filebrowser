@@ -1,36 +1,60 @@
 <template>
-  <div v-show="active" @click="closeHovers" class="overlay"></div>
+  <div
+    v-show="active"
+    class="overlay"
+    @click="closeHovers"
+  />
   <nav :class="{ active }">
     <template v-if="isLoggedIn">
-      <button @click="toAccountSettings" class="action">
+      <button
+        class="action"
+        @click="toAccountSettings"
+      >
         <i class="material-icons">person</i>
         <span>{{ user.username }}</span>
       </button>
       <button
         class="action my-files-action"
-        @click="toggleMyFiles"
         :aria-label="$t('sidebar.myFiles')"
         :title="$t('sidebar.myFiles')"
+        @click="toggleMyFiles"
       >
         <i class="material-icons">folder</i>
         <span>{{ $t("sidebar.myFiles") }}</span>
-        <i class="material-icons expand-icon">{{ myFilesOpen ? 'expand_less' : 'expand_more' }}</i>
+        <i class="material-icons expand-icon">{{
+          myFilesOpen ? "expand_less" : "expand_more"
+        }}</i>
       </button>
 
-      <div v-show="myFilesOpen" class="my-files-list">
-        <button class="action" @click="toRoot">
+      <div
+        v-show="myFilesOpen"
+        class="my-files-list"
+      >
+        <button
+          class="action"
+          @click="toRoot"
+        >
           <i class="material-icons">home</i>
-          <span>{{ $t('files.home') }}</span>
+          <span>{{ $t("files.home") }}</span>
         </button>
 
-        <button class="action" @click="addPath">
+        <button
+          class="action"
+          @click="addPath"
+        >
           <i class="material-icons">add</i>
-          <span>{{ $t('prompts.addPath') }}</span>
+          <span>{{ $t("prompts.addPath") }}</span>
         </button>
 
-        <template v-for="(s, idx) in user.shortcuts || []" :key="idx">
+        <template
+          v-for="(s, idx) in user.shortcuts || []"
+          :key="idx"
+        >
           <div class="shortcut-row">
-            <button class="action shortcut" @click="openShortcut(s)">
+            <button
+              class="action shortcut"
+              @click="openShortcut(s)"
+            >
               <i class="material-icons">chevron_right</i>
               <span>{{ displayShortcut(s) }}</span>
             </button>
@@ -38,9 +62,11 @@
             <div class="shortcut-actions">
               <button
                 class="icon-btn"
-                @click.stop="showHover({ prompt: 'editShortcut', props: { idx } })"
                 :aria-label="$t('buttons.edit')"
                 :title="$t('buttons.edit')"
+                @click.stop="
+                  showHover({ prompt: 'editShortcut', props: { idx } })
+                "
               >
                 <i class="material-icons">more_vert</i>
               </button>
@@ -51,20 +77,20 @@
 
       <div v-if="user.perm.create">
         <button
-          @click="showHover('newDir')"
           class="action"
           :aria-label="$t('sidebar.newFolder')"
           :title="$t('sidebar.newFolder')"
+          @click="showHover('newDir')"
         >
           <i class="material-icons">create_new_folder</i>
           <span>{{ $t("sidebar.newFolder") }}</span>
         </button>
 
         <button
-          @click="showHover('newFile')"
           class="action"
           :aria-label="$t('sidebar.newFile')"
           :title="$t('sidebar.newFile')"
+          @click="showHover('newFile')"
         >
           <i class="material-icons">note_add</i>
           <span>{{ $t("sidebar.newFile") }}</span>
@@ -74,9 +100,9 @@
       <div v-if="user.perm.admin">
         <button
           class="action"
-          @click="toGlobalSettings"
           :aria-label="$t('sidebar.settings')"
           :title="$t('sidebar.settings')"
+          @click="toGlobalSettings"
         >
           <i class="material-icons">settings_applications</i>
           <span>{{ $t("sidebar.settings") }}</span>
@@ -84,11 +110,11 @@
       </div>
       <button
         v-if="canLogout"
-        @click="logout"
-        class="action"
         id="logout"
+        class="action"
         :aria-label="$t('sidebar.logout')"
         :title="$t('sidebar.logout')"
+        @click="logout"
       >
         <i class="material-icons">exit_to_app</i>
         <span>{{ $t("sidebar.logout") }}</span>
@@ -119,12 +145,15 @@
     </template>
 
     <div
-      class="credits"
       v-if="isFiles && !disableUsedPercentage"
+      class="credits"
       style="width: 90%; margin: 2em 2.5em 3em 2.5em"
     >
-      <progress-bar :val="usage.usedPercentage" size="small"></progress-bar>
-      <br />
+      <progress-bar
+        :val="usage.usedPercentage"
+        size="small"
+      />
+      <br>
       {{ usage.used }} of {{ usage.total }} used
     </div>
 
@@ -136,8 +165,7 @@
           rel="noopener noreferrer"
           target="_blank"
           href="https://github.com/filebrowser/filebrowser"
-          >File Browser</a
-        >
+        >File Browser</a>
         <span> {{ " " }} {{ version }}</span>
       </span>
       <span>
@@ -174,15 +202,15 @@ import prettyBytes from "pretty-bytes";
 const USAGE_DEFAULT = { used: "0 B", total: "0 B", usedPercentage: 0 };
 
 export default {
-  name: "sidebar",
-  setup() {
-    const usage = reactive(USAGE_DEFAULT);
-    return { usage, usageAbortController: new AbortController() };
-  },
+  name: "Sidebar",
   components: {
     ProgressBar,
   },
   inject: ["$showError"],
+  setup() {
+    const usage = reactive(USAGE_DEFAULT);
+    return { usage, usageAbortController: new AbortController() };
+  },
   computed: {
     ...mapState(useAuthStore, ["user", "isLoggedIn"]),
     ...mapState(useFileStore, ["isFiles", "reload"]),
@@ -335,22 +363,47 @@ export default {
 </script>
 
 <style scoped>
-.shortcut-row { display: flex; align-items: center; gap: 8px; }
-.shortcut-row .action.shortcut { flex: 1; text-align: left; }
-.shortcut-actions { margin-left: auto; display: flex; gap: 6px; }
-.icon-btn { background: transparent; border: none; cursor: pointer; padding: 4px; }
-.shortcut-edit-input { width: 100%; }
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shortcut-row .action.shortcut {
+  flex: 1;
+  text-align: left;
+}
+.shortcut-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.shortcut-edit-input {
+  width: 100%;
+}
 
 .icon-btn i {
-  color: rgba(102,102,102,0.9) !important;
+  color: rgba(102, 102, 102, 0.9) !important;
   font-size: 18px;
 }
 .icon-btn:hover i {
-  color: rgba(30,30,30,0.95) !important;
+  color: rgba(30, 30, 30, 0.95) !important;
 }
 .icon-btn:hover {
-  background: rgba(0,0,0,0.04);
+  background: rgba(0, 0, 0, 0.04);
   border-radius: 4px;
 }
-.my-files-list { margin-top: 0.5em; max-height: calc(100vh - 200px); overflow-y: auto; overflow-x: hidden; padding-right: 6px; position: relative; }
+.my-files-list {
+  margin-top: 0.5em;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+  position: relative;
+}
 </style>

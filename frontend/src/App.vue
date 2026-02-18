@@ -1,6 +1,6 @@
 <template>
   <div>
-    <router-view></router-view>
+    <router-view />
   </div>
 </template>
 
@@ -28,6 +28,8 @@ onMounted(() => {
 
 // handles ltr/rtl changes
 watch(locale, (newValue) => {
-  newValue && setHtmlLocale(newValue);
+  if (newValue) {
+    setHtmlLocale(newValue);
+  }
 });
 </script>

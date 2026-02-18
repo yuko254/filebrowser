@@ -1,35 +1,53 @@
 <template>
-  <errors v-if="error" :errorCode="error.status" />
-  <div class="row" v-else-if="!layoutStore.loading && settings !== null">
+  <errors
+    v-if="error"
+    :error-code="error.status"
+  />
+  <div
+    v-else-if="!layoutStore.loading && settings !== null"
+    class="row"
+  >
     <div class="column">
-      <form class="card" @submit.prevent="save">
+      <form
+        class="card"
+        @submit.prevent="save"
+      >
         <div class="card-title">
           <h2>{{ t("settings.globalSettings") }}</h2>
         </div>
 
         <div class="card-content">
           <p>
-            <input type="checkbox" v-model="settings.signup" />
+            <input
+              v-model="settings.signup"
+              type="checkbox"
+            >
             {{ t("settings.allowSignup") }}
           </p>
 
           <p>
-            <input type="checkbox" v-model="settings.createUserDir" />
+            <input
+              v-model="settings.createUserDir"
+              type="checkbox"
+            >
             {{ t("settings.createUserDir") }}
           </p>
 
           <p>
-            <input type="checkbox" v-model="settings.hideLoginButton" />
+            <input
+              v-model="settings.hideLoginButton"
+              type="checkbox"
+            >
             {{ t("settings.hideLoginButton") }}
           </p>
 
           <p>
             <label class="small">{{ t("settings.userHomeBasePath") }}</label>
             <input
+              v-model="settings.userHomeBasePath"
               class="input input--block"
               type="text"
-              v-model="settings.userHomeBasePath"
-            />
+            >
           </p>
 
           <p>
@@ -37,26 +55,30 @@
               t("settings.minimumPasswordLength")
             }}</label>
             <vue-number-input
-              controls
-              v-model.number="settings.minimumPasswordLength"
               id="minimumPasswordLength"
+              v-model.number="settings.minimumPasswordLength"
+              controls
               :min="1"
             />
           </p>
 
           <h3>{{ t("settings.rules") }}</h3>
-          <p class="small">{{ t("settings.globalRules") }}</p>
+          <p class="small">
+            {{ t("settings.globalRules") }}
+          </p>
           <rules v-model:rules="settings.rules" />
 
           <div v-if="enableExec">
             <h3>{{ t("settings.executeOnShell") }}</h3>
-            <p class="small">{{ t("settings.executeOnShellDescription") }}</p>
+            <p class="small">
+              {{ t("settings.executeOnShellDescription") }}
+            </p>
             <input
+              v-model="shellValue"
               class="input input--block"
               type="text"
               placeholder="bash -c, cmd /c, ..."
-              v-model="shellValue"
-            />
+            >
           </div>
 
           <h3>{{ t("settings.branding") }}</h3>
@@ -71,45 +93,44 @@
               class="link"
               target="_blank"
               href="https://filebrowser.org/configuration.html#custom-branding"
-              >{{ t("settings.documentation") }}</a
-            >
+            >{{ t("settings.documentation") }}</a>
           </i18n-t>
 
           <p>
             <input
-              type="checkbox"
-              v-model="settings.branding.disableExternal"
               id="branding-links"
-            />
+              v-model="settings.branding.disableExternal"
+              type="checkbox"
+            >
             {{ t("settings.disableExternalLinks") }}
           </p>
 
           <p>
             <input
-              type="checkbox"
-              v-model="settings.branding.disableUsedPercentage"
               id="branding-used-disk"
-            />
+              v-model="settings.branding.disableUsedPercentage"
+              type="checkbox"
+            >
             {{ t("settings.disableUsedDiskPercentage") }}
           </p>
 
           <p>
             <label for="theme">{{ t("settings.themes.title") }}</label>
             <themes
-              class="input input--block"
-              v-model:theme="settings.branding.theme"
               id="theme"
-            ></themes>
+              v-model:theme="settings.branding.theme"
+              class="input input--block"
+            />
           </p>
 
           <p>
             <label for="branding-name">{{ t("settings.instanceName") }}</label>
             <input
+              id="branding-name"
+              v-model="settings.branding.name"
               class="input input--block"
               type="text"
-              v-model="settings.branding.name"
-              id="branding-name"
-            />
+            >
           </p>
 
           <p>
@@ -117,16 +138,18 @@
               t("settings.brandingDirectoryPath")
             }}</label>
             <input
+              id="branding-files"
+              v-model="settings.branding.files"
               class="input input--block"
               type="text"
-              v-model="settings.branding.files"
-              id="branding-files"
-            />
+            >
           </p>
 
           <h3>{{ t("settings.tusUploads") }}</h3>
 
-          <p class="small">{{ t("settings.tusUploadsHelp") }}</p>
+          <p class="small">
+            {{ t("settings.tusUploadsHelp") }}
+          </p>
 
           <div class="tusConditionalSettings">
             <p>
@@ -134,11 +157,11 @@
                 t("settings.tusUploadsChunkSize")
               }}</label>
               <input
+                id="tus-chunkSize"
+                v-model="formattedChunkSize"
                 class="input input--block"
                 type="text"
-                v-model="formattedChunkSize"
-                id="tus-chunkSize"
-              />
+              >
             </p>
 
             <p>
@@ -146,9 +169,9 @@
                 t("settings.tusUploadsRetryCount")
               }}</label>
               <vue-number-input
-                controls
-                v-model.number="settings.tus.retryCount"
                 id="tus-retryCount"
+                v-model.number="settings.tus.retryCount"
+                controls
                 :min="0"
               />
             </p>
@@ -160,24 +183,29 @@
             class="button button--flat"
             type="submit"
             :value="t('buttons.update')"
-          />
+          >
         </div>
       </form>
     </div>
 
     <div class="column">
-      <form class="card" @submit.prevent="save">
+      <form
+        class="card"
+        @submit.prevent="save"
+      >
         <div class="card-title">
           <h2>{{ t("settings.userDefaults") }}</h2>
         </div>
 
         <div class="card-content">
-          <p class="small">{{ t("settings.defaultUserDescription") }}</p>
+          <p class="small">
+            {{ t("settings.defaultUserDescription") }}
+          </p>
 
           <user-form
-            :isNew="false"
-            :isDefault="true"
             v-model:user="settings.defaults"
+            :is-new="false"
+            :is-default="true"
           />
         </div>
 
@@ -186,13 +214,17 @@
             class="button button--flat"
             type="submit"
             :value="t('buttons.update')"
-          />
+          >
         </div>
       </form>
     </div>
 
     <div class="column">
-      <form v-if="enableExec" class="card" @submit.prevent="save">
+      <form
+        v-if="enableExec"
+        class="card"
+        @submit.prevent="save"
+      >
         <div class="card-title">
           <h2>{{ t("settings.commandRunner") }}</h2>
         </div>
@@ -210,8 +242,7 @@
               class="link"
               target="_blank"
               href="https://filebrowser.org/configuration.html#command-runner"
-              >{{ t("settings.documentation") }}</a
-            >
+            >{{ t("settings.documentation") }}</a>
           </i18n-t>
 
           <div
@@ -219,16 +250,19 @@
             :key="key"
             class="collapsible"
           >
-            <input :id="key" type="checkbox" />
+            <input
+              :id="key"
+              type="checkbox"
+            >
             <label :for="key">
               <p>{{ capitalize(key) }}</p>
               <i class="material-icons">arrow_drop_down</i>
             </label>
             <div class="collapse">
               <textarea
-                class="input input--block input--textarea"
                 v-model.trim="commandObject[key]"
-              ></textarea>
+                class="input input--block input--textarea"
+              />
             </div>
           </div>
         </div>
@@ -238,7 +272,7 @@
             class="button button--flat"
             type="submit"
             :value="t('buttons.update')"
-          />
+          >
         </div>
       </form>
     </div>

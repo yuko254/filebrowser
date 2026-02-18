@@ -6,33 +6,32 @@
 
     <div class="card-content">
       <p>
-        {{ $t("prompts.renameMessage") }} <code>{{ oldName() }}</code
-        >:
+        {{ $t("prompts.renameMessage") }} <code>{{ oldName() }}</code>:
       </p>
       <input
         id="focus-prompt"
+        v-model.trim="name"
         class="input input--block"
         type="text"
         @keyup.enter="submit"
-        v-model.trim="name"
-      />
+      >
     </div>
 
     <div class="card-action">
       <button
         class="button button--flat button--grey"
-        @click="closeHovers"
         :aria-label="$t('buttons.cancel')"
         :title="$t('buttons.cancel')"
+        @click="closeHovers"
       >
         {{ $t("buttons.cancel") }}
       </button>
       <button
-        @click="submit"
         class="button button--flat"
         type="submit"
         :aria-label="$t('buttons.rename')"
         :title="$t('buttons.rename')"
+        @click="submit"
       >
         {{ $t("buttons.rename") }}
       </button>
@@ -49,7 +48,8 @@ import { files as api } from "@/api";
 import { removePrefix } from "@/api/utils";
 
 export default {
-  name: "rename",
+  name: "Rename",
+  inject: ["$showError"],
   data: function () {
     return {
       name: "",
@@ -58,7 +58,6 @@ export default {
   created() {
     this.name = this.oldName();
   },
-  inject: ["$showError"],
   computed: {
     ...mapState(useFileStore, [
       "req",

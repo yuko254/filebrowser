@@ -9,11 +9,15 @@
       <i class="material-icons">home</i>
     </component>
 
-    <span v-for="(link, index) in items" :key="index">
-      <span class="chevron"
-        ><i class="material-icons">keyboard_arrow_right</i></span
-      >
-      <component :is="element" :to="link.url">{{ link.name }}</component>
+    <span
+      v-for="(link, index) in items"
+      :key="index"
+    >
+      <span class="chevron"><i class="material-icons">keyboard_arrow_right</i></span>
+      <component
+        :is="element"
+        :to="link.url"
+      >{{ link.name }}</component>
     </span>
   </div>
 </template>

@@ -1,21 +1,32 @@
 <template>
   <div class="csv-viewer">
-    <div v-if="displayError" class="csv-error">
+    <div
+      v-if="displayError"
+      class="csv-error"
+    >
       <i class="material-icons">error</i>
       <p>{{ displayError }}</p>
     </div>
-    <div v-else-if="parsed.headers.length === 0" class="csv-empty">
+    <div
+      v-else-if="parsed.headers.length === 0"
+      class="csv-empty"
+    >
       <i class="material-icons">description</i>
       <p>{{ $t("files.lonely") }}</p>
     </div>
-    <div v-else class="csv-table-container" @wheel.stop @touchmove.stop>
+    <div
+      v-else
+      class="csv-table-container"
+      @wheel.stop
+      @touchmove.stop
+    >
       <div class="csv-header">
         <div class="header-select">
           <label for="columnSeparator">{{ $t("files.columnSeparator") }}</label>
           <select
             id="columnSeparator"
-            class="input input--block"
             v-model="columnSeparator"
+            class="input input--block"
           >
             <option :value="[',']">
               {{ $t("files.csvSeparators.comma") }}
@@ -28,17 +39,20 @@
             </option>
           </select>
         </div>
-        <div class="header-select" v-if="isEncodedContent">
+        <div
+          v-if="isEncodedContent"
+          class="header-select"
+        >
           <label for="fileEncoding">{{ $t("files.fileEncoding") }}</label>
           <select
             id="fileEncoding"
-            class="input input--block"
             v-model="selectedEncoding"
+            class="input input--block"
           >
             <option
               v-for="encoding in availableEncodings"
-              :value="encoding"
               :key="encoding"
+              :value="encoding"
             >
               {{ encoding }}
             </option>
@@ -48,21 +62,33 @@
       <table class="csv-table">
         <thead>
           <tr>
-            <th v-for="(header, index) in parsed.headers" :key="index">
+            <th
+              v-for="(header, index) in parsed.headers"
+              :key="index"
+            >
               {{ header || `Column ${index + 1}` }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, rowIndex) in parsed.rows" :key="rowIndex">
-            <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+          <tr
+            v-for="(row, rowIndex) in parsed.rows"
+            :key="rowIndex"
+          >
+            <td
+              v-for="(cell, cellIndex) in row"
+              :key="cellIndex"
+            >
               {{ cell }}
             </td>
           </tr>
         </tbody>
       </table>
       <div class="csv-footer">
-        <div class="csv-info" v-if="parsed.rows.length > 100">
+        <div
+          v-if="parsed.rows.length > 100"
+          class="csv-info"
+        >
           <i class="material-icons">info</i>
           <span>
             {{ $t("files.showingRows", { count: parsed.rows.length }) }}

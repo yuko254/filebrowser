@@ -8,17 +8,17 @@
       <button
         id="focus-prompt"
         class="button button--flat button--grey"
-        @click="layoutStore.closeHovers"
         :aria-label="t('buttons.cancel')"
         :title="t('buttons.cancel')"
         tabindex="1"
+        @click="layoutStore.closeHovers"
       >
         {{ t("buttons.cancel") }}
       </button>
       <button
         class="button button--flat"
-        @click="layoutStore.currentPrompt?.confirm"
         tabindex="2"
+        @click="layoutStore.currentPrompt?.confirm"
       >
         {{ t("buttons.delete") }}
       </button>

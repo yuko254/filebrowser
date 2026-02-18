@@ -1,6 +1,10 @@
 <template>
   <div>
-    <header-bar v-if="showHeader" showMenu showLogo />
+    <header-bar
+      v-if="showHeader"
+      show-menu
+      show-logo
+    />
 
     <h2 class="message">
       <i class="material-icons">{{ info.icon }}</i>

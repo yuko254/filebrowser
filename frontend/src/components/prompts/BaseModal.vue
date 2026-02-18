@@ -3,11 +3,11 @@
     class="vfm-modal"
     overlay-transition="vfm-fade"
     content-transition="vfm-fade"
-    @closed="layoutStore.closeHovers"
     :focus-trap="{
       initialFocus: '#focus-prompt',
       fallbackFocus: 'div.vfm__content',
     }"
+    @closed="layoutStore.closeHovers"
   >
     <slot />
   </VueFinalModal>

@@ -1,5 +1,8 @@
 <template>
-  <div class="card floating" id="download">
+  <div
+    id="download"
+    class="card floating"
+  >
     <div class="card-title">
       <h2>{{ t("prompts.download") }}</h2>
     </div>
@@ -8,8 +11,8 @@
       <p>{{ t("prompts.downloadMessage") }}</p>
 
       <button
-        id="focus-prompt"
         v-for="(ext, format) in formats"
+        id="focus-prompt"
         :key="format"
         class="button button--block"
         @click="layoutStore.currentPrompt?.confirm(format)"

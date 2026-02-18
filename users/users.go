@@ -105,10 +105,8 @@ func (u *User) Clean(baseScope string, fields ...string) error {
 				}
 				// normalize backslashes to slashes
 				p = strings.ReplaceAll(p, "\\\\", "/")
-				// remove /files prefix
-				if strings.HasPrefix(p, "/files") {
-					p = strings.TrimPrefix(p, "/files")
-				}
+				// remove /files prefix if present
+				p = strings.TrimPrefix(p, "/files")
 				// handle Windows absolute paths that may have been saved as "/C:/path"
 				if len(p) >= 3 && p[0] == '/' && ((p[1] >= 'A' && p[1] <= 'Z') || (p[1] >= 'a' && p[1] <= 'z')) && p[2] == ':' {
 					p = strings.TrimPrefix(p, "/")

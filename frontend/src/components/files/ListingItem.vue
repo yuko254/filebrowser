@@ -4,6 +4,11 @@
     role="button"
     tabindex="0"
     :draggable="isDraggable"
+    :data-dir="isDir"
+    :data-type="type"
+    :aria-label="name"
+    :aria-selected="isSelected"
+    :data-ext="getExtension(name).toLowerCase()"
     @dragstart="dragStart"
     @dragover="dragOver"
     @drop="drop"
@@ -15,26 +20,40 @@
     @touchend="handleTouchEnd"
     @touchcancel="handleTouchCancel"
     @touchmove="handleTouchMove"
-    :data-dir="isDir"
-    :data-type="type"
-    :aria-label="name"
-    :aria-selected="isSelected"
-    :data-ext="getExtension(name).toLowerCase()"
     @contextmenu="contextMenu"
   >
     <div>
       <img
-        v-if="!readOnly && (type === 'image' || type === 'video') && isThumbsEnabled"
+        v-if="
+          !readOnly && (type === 'image' || type === 'video') && isThumbsEnabled
+        "
         v-lazy="thumbnailUrl"
+      >
+      <i
+        v-else
+        class="material-icons"
       />
-      <i v-else class="material-icons"></i>
     </div>
 
     <div>
-      <p class="name">{{ name }}</p>
+      <p class="name">
+        {{ name }}
+      </p>
 
-      <p v-if="isDir" class="size" data-order="-1">&mdash;</p>
-      <p v-else class="size" :data-order="humanSize()">{{ humanSize() }}</p>
+      <p
+        v-if="isDir"
+        class="size"
+        data-order="-1"
+      >
+        &mdash;
+      </p>
+      <p
+        v-else
+        class="size"
+        :data-order="humanSize()"
+      >
+        {{ humanSize() }}
+      </p>
 
       <p class="modified">
         <time :datetime="modified">{{ humanTime() }}</time>
@@ -317,7 +336,6 @@ const handleSingleClick = (event: Event | KeyboardEvent) => {
   fileStore.selected.push(props.index);
 };
 
-
 const open = () => {
   if (props.isDir) {
     router.push({ path: props.url });
@@ -325,7 +343,6 @@ const open = () => {
     window.open(props.url, "_blank");
   }
 };
-
 
 const getExtension = (fileName: string): string => {
   const lastDotIndex = fileName.lastIndexOf(".");

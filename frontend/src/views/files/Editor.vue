@@ -1,19 +1,23 @@
 <template>
   <div id="editor-container">
     <header-bar>
-      <action icon="close" :label="t('buttons.close')" @action="close()" />
+      <action
+        icon="close"
+        :label="t('buttons.close')"
+        @action="close()"
+      />
       <title>{{ fileStore.req?.name ?? "" }}</title>
 
       <action
         icon="add"
-        @action="increaseFontSize"
         :label="t('buttons.increaseFontSize')"
+        @action="increaseFontSize"
       />
       <span class="editor-font-size">{{ fontSize }}px</span>
       <action
         icon="remove"
-        @action="decreaseFontSize"
         :label="t('buttons.decreaseFontSize')"
+        @action="decreaseFontSize"
       />
 
       <action
@@ -25,24 +29,30 @@
       />
 
       <action
+        v-show="isMarkdownFile"
         icon="preview"
         :label="t('buttons.preview')"
         @action="preview()"
-        v-show="isMarkdownFile"
       />
     </header-bar>
 
     <!-- preview container -->
-    <div class="loading delayed" v-if="layoutStore.loading">
+    <div
+      v-if="layoutStore.loading"
+      class="loading delayed"
+    >
       <div class="spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
+        <div class="bounce1" />
+        <div class="bounce2" />
+        <div class="bounce3" />
       </div>
     </div>
     <template v-else>
       <div class="editor-header">
-        <Breadcrumbs base="/files" noLink />
+        <Breadcrumbs
+          base="/files"
+          no-link
+        />
 
         <div>
           <button
@@ -71,8 +81,11 @@
         id="preview-container"
         class="md_preview"
         v-html="previewContent"
-      ></div>
-      <form v-show="!isPreview || !isMarkdownFile" id="editor"></form>
+      />
+      <form
+        v-show="!isPreview || !isMarkdownFile"
+        id="editor"
+      />
     </template>
   </div>
 </template>
@@ -121,7 +134,7 @@ const isMarkdownFile =
   fileStore.req?.name.endsWith(".markdown");
 const katexOptions = {
   output: "mathml" as const,
-  throwOnError: false
+  throwOnError: false,
 };
 marked.use(markedKatex(katexOptions));
 

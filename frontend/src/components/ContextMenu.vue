@@ -1,8 +1,8 @@
 <template>
   <div
-    class="context-menu"
-    ref="contextMenu"
     v-show="show"
+    ref="contextMenu"
+    class="context-menu"
     :style="{
       top: `${props.pos.y}px`,
       left: `${left}px`,

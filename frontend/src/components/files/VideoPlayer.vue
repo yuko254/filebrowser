@@ -1,14 +1,19 @@
 <template>
-  <video ref="videoPlayer" class="video-max video-js" controls preload="auto">
-    <source />
+  <video
+    ref="videoPlayer"
+    class="video-max video-js"
+    controls
+    preload="auto"
+  >
+    <source>
     <track
-      kind="subtitles"
       v-for="(sub, index) in subtitles"
       :key="index"
+      kind="subtitles"
       :src="sub"
       :label="subLabel(sub)"
       :default="index === 0"
-    />
+    >
     <p class="vjs-no-js">
       Sorry, your browser doesn't support embedded videos, but don't worry, you
       can <a :href="source">download it</a>

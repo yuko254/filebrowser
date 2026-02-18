@@ -1,6 +1,14 @@
 <template>
-  <select name="selectLanguage" v-on:change="change" :value="locale">
-    <option v-for="(language, value) in locales" :key="value" :value="value">
+  <select
+    name="selectLanguage"
+    :value="locale"
+    @change="change"
+  >
+    <option
+      v-for="(language, value) in locales"
+      :key="value"
+      :value="value"
+    >
       {{ language }}
     </option>
   </select>
@@ -10,7 +18,7 @@
 import { markRaw } from "vue";
 
 export default {
-  name: "languages",
+  name: "Languages",
   props: ["locale"],
   data() {
     const dataObj = {};

@@ -1,6 +1,9 @@
 <template>
   <header>
-    <img v-if="showLogo" :src="logoURL" />
+    <img
+      v-if="showLogo"
+      :src="logoURL"
+    >
     <Action
       v-if="showMenu"
       class="menu-button"
@@ -27,8 +30,8 @@
     />
 
     <div
-      class="overlay"
       v-show="layoutStore.currentPromptName == 'more'"
+      class="overlay"
       @click="layoutStore.closeHovers"
     />
   </header>

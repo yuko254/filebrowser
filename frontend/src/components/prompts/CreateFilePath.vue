@@ -1,15 +1,24 @@
 <template>
   <div>
-    <div class="path-container" ref="container">
-      <template v-for="(item, index) in path" :key="index">
+    <div
+      ref="container"
+      class="path-container"
+    >
+      <template
+        v-for="(item, index) in path"
+        :key="index"
+      >
         /
         <span class="path-item">
           <span
             v-if="isDir === true || index < path.length - 1"
             class="material-icons"
-            >folder
+          >folder
           </span>
-          <span v-else class="material-icons">insert_drive_file</span>
+          <span
+            v-else
+            class="material-icons"
+          >insert_drive_file</span>
           {{ item }}
         </span>
       </template>

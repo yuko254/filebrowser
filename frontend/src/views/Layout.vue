@@ -1,23 +1,26 @@
 <template>
   <div>
-    <div v-if="uploadStore.totalBytes" class="progress">
+    <div
+      v-if="uploadStore.totalBytes"
+      class="progress"
+    >
       <div
-        v-bind:style="{
+        :style="{
           width: sentPercent + '%',
         }"
-      ></div>
+      />
     </div>
-    <sidebar></sidebar>
+    <sidebar />
     <main>
-      <router-view></router-view>
+      <router-view />
       <shell
         v-if="
           enableExec && authStore.isLoggedIn && authStore.user?.perm.execute
         "
       />
     </main>
-    <prompts></prompts>
-    <upload-files></upload-files>
+    <prompts />
+    <upload-files />
   </div>
 </template>
 

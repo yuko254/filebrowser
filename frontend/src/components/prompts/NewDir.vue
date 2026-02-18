@@ -8,22 +8,25 @@
       <p>{{ t("prompts.newDirMessage") }}</p>
       <input
         id="focus-prompt"
+        v-model.trim="name"
         class="input input--block"
         type="text"
-        @keyup.enter="submit"
-        v-model.trim="name"
         tabindex="1"
+        @keyup.enter="submit"
+      >
+      <CreateFilePath
+        :name="name"
+        :is-dir="true"
       />
-      <CreateFilePath :name="name" :is-dir="true" />
     </div>
 
     <div class="card-action">
       <button
         class="button button--flat button--grey"
-        @click="layoutStore.closeHovers"
         :aria-label="t('buttons.cancel')"
         :title="t('buttons.cancel')"
         tabindex="3"
+        @click="layoutStore.closeHovers"
       >
         {{ t("buttons.cancel") }}
       </button>
@@ -31,8 +34,8 @@
         class="button button--flat"
         :aria-label="$t('buttons.create')"
         :title="t('buttons.create')"
-        @click="submit"
         tabindex="2"
+        @click="submit"
       >
         {{ t("buttons.create") }}
       </button>

@@ -9,13 +9,16 @@
         {{ $t("prompts.filesSelected", { count: selected.length }) }}
       </p>
 
-      <p class="break-word" v-if="selected.length < 2">
+      <p
+        v-if="selected.length < 2"
+        class="break-word"
+      >
         <strong>{{ $t("prompts.displayName") }}</strong> {{ name }}
       </p>
 
       <p v-if="!dir || selected.length > 1">
         <strong>{{ $t("prompts.size") }}:</strong>
-        <span id="content_length"></span> {{ humanSize }}
+        <span id="content_length" /> {{ humanSize }}
       </p>
 
       <div v-if="resolution">
@@ -23,7 +26,10 @@
         {{ resolution.width }} x {{ resolution.height }}
       </div>
 
-      <p v-if="selected.length < 2" :title="modTime">
+      <p
+        v-if="selected.length < 2"
+        :title="modTime"
+      >
         <strong>{{ $t("prompts.lastModified") }}:</strong> {{ humanTime }}
       </p>
 
@@ -38,48 +44,32 @@
 
       <template v-if="!dir">
         <p>
-          <strong>MD5: </strong
-          ><code
-            ><a
-              @click="checksum($event, 'md5')"
-              @keypress.enter="checksum($event, 'md5')"
-              tabindex="2"
-              >{{ $t("prompts.show") }}</a
-            ></code
-          >
+          <strong>MD5: </strong><code><a
+            tabindex="2"
+            @click="checksum($event, 'md5')"
+            @keypress.enter="checksum($event, 'md5')"
+          >{{ $t("prompts.show") }}</a></code>
         </p>
         <p>
-          <strong>SHA1: </strong
-          ><code
-            ><a
-              @click="checksum($event, 'sha1')"
-              @keypress.enter="checksum($event, 'sha1')"
-              tabindex="3"
-              >{{ $t("prompts.show") }}</a
-            ></code
-          >
+          <strong>SHA1: </strong><code><a
+            tabindex="3"
+            @click="checksum($event, 'sha1')"
+            @keypress.enter="checksum($event, 'sha1')"
+          >{{ $t("prompts.show") }}</a></code>
         </p>
         <p>
-          <strong>SHA256: </strong
-          ><code
-            ><a
-              @click="checksum($event, 'sha256')"
-              @keypress.enter="checksum($event, 'sha256')"
-              tabindex="4"
-              >{{ $t("prompts.show") }}</a
-            ></code
-          >
+          <strong>SHA256: </strong><code><a
+            tabindex="4"
+            @click="checksum($event, 'sha256')"
+            @keypress.enter="checksum($event, 'sha256')"
+          >{{ $t("prompts.show") }}</a></code>
         </p>
         <p>
-          <strong>SHA512: </strong
-          ><code
-            ><a
-              @click="checksum($event, 'sha512')"
-              @keypress.enter="checksum($event, 'sha512')"
-              tabindex="5"
-              >{{ $t("prompts.show") }}</a
-            ></code
-          >
+          <strong>SHA512: </strong><code><a
+            tabindex="5"
+            @click="checksum($event, 'sha512')"
+            @keypress.enter="checksum($event, 'sha512')"
+          >{{ $t("prompts.show") }}</a></code>
         </p>
       </template>
     </div>
@@ -88,10 +78,10 @@
       <button
         id="focus-prompt"
         type="submit"
-        @click="closeHovers"
         class="button button--flat"
         :aria-label="$t('buttons.ok')"
         :title="$t('buttons.ok')"
+        @click="closeHovers"
       >
         {{ $t("buttons.ok") }}
       </button>
@@ -108,7 +98,7 @@ import dayjs from "dayjs";
 import { files as api } from "@/api";
 
 export default {
-  name: "info",
+  name: "Info",
   inject: ["$showError"],
   computed: {
     ...mapState(useFileStore, [

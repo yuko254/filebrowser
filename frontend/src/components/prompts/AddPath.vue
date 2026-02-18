@@ -7,22 +7,36 @@
     <div class="card-content">
       <p>{{ $t("prompts.addPathMessage") }}</p>
       <label>{{ $t("prompts.name") }}</label>
-      <input v-model="name" class="input" />
+      <input
+        v-model="name"
+        class="input"
+      >
       <file-list
         ref="fileList"
         :only-dirs="true"
         :system="true"
         :initial-from-store="false"
-        @update:selected="(val) => (selected = val)"
         tabindex="1"
+        @update:selected="(val) => (selected = val)"
       />
     </div>
 
-    <div class="card-action" style="display:flex;justify-content:flex-end;gap:8px">
-      <button class="button button--flat button--grey" @click="closeHovers">
+    <div
+      class="card-action"
+      style="display: flex; justify-content: flex-end; gap: 8px"
+    >
+      <button
+        class="button button--flat button--grey"
+        @click="closeHovers"
+      >
         {{ $t("buttons.cancel") }}
       </button>
-      <button id="focus-prompt" class="button" @click="add" :disabled="!selected">
+      <button
+        id="focus-prompt"
+        class="button"
+        :disabled="!selected"
+        @click="add"
+      >
         {{ $t("buttons.add") }}
       </button>
     </div>
@@ -33,21 +47,20 @@
 import FileList from "./FileList.vue";
 import { mapState } from "pinia";
 import { useAuthStore } from "@/stores/auth";
-import { useFileStore } from "@/stores/file";
 import { useLayoutStore } from "@/stores/layout";
 import { files as api } from "@/api";
 import { users as usersApi } from "@/api";
 
 export default {
-  name: "add-path",
+  name: "AddPath",
   components: { FileList },
+  inject: ["$showError"],
   data() {
     return {
       name: "",
       selected: null,
     };
   },
-  inject: ["$showError"],
   computed: {
     ...mapState(useAuthStore, ["user"]),
   },
@@ -77,7 +90,8 @@ export default {
           underlyingPath = underlyingPath.replace(/^\/files/, "");
         }
         underlyingPath = underlyingPath.replace(/\\/g, "/");
-        if (!underlyingPath.startsWith("/")) underlyingPath = "/" + underlyingPath;
+        if (!underlyingPath.startsWith("/"))
+          underlyingPath = "/" + underlyingPath;
 
         const newEntry = {
           name: this.name || "",
@@ -85,7 +99,9 @@ export default {
           system: !!user?.perm?.admin,
         };
         const newShortcuts = (user.shortcuts || []).concat(newEntry);
-        await usersApi.update({ id: user.id, shortcuts: newShortcuts }, ["shortcuts"]);
+        await usersApi.update({ id: user.id, shortcuts: newShortcuts }, [
+          "shortcuts",
+        ]);
         auth.updateUser({ shortcuts: newShortcuts });
         this.closeHovers();
       } catch (e) {
@@ -101,5 +117,8 @@ export default {
 </script>
 
 <style scoped>
-.card-content input.input { width: 100%; margin-bottom: 0.5em }
+.card-content input.input {
+  width: 100%;
+  margin-bottom: 0.5em;
+}
 </style>

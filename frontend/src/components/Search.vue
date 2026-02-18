@@ -1,39 +1,58 @@
 <template>
-  <div id="search" @click="open" v-bind:class="{ active, ongoing }">
+  <div
+    id="search"
+    :class="{ active, ongoing }"
+    @click="open"
+  >
     <div id="input">
       <button
         v-if="active"
         class="action"
-        @click="close"
         :aria-label="closeButtonTitle"
         :title="closeButtonTitle"
+        @click="close"
       >
-        <i v-if="ongoing" class="material-icons">stop_circle</i>
-        <i v-else class="material-icons">arrow_back</i>
+        <i
+          v-if="ongoing"
+          class="material-icons"
+        >stop_circle</i>
+        <i
+          v-else
+          class="material-icons"
+        >arrow_back</i>
       </button>
-      <i v-else class="material-icons">search</i>
+      <i
+        v-else
+        class="material-icons"
+      >search</i>
       <input
-        type="text"
-        @keyup.exact="keyup"
-        @keyup.enter="submit"
         ref="input"
-        :autofocus="active"
         v-model.trim="prompt"
+        type="text"
+        :autofocus="active"
         :aria-label="$t('search.search')"
         :placeholder="$t('search.search')"
-      />
+        @keyup.exact="keyup"
+        @keyup.enter="submit"
+      >
       <i
         v-show="ongoing"
         class="material-icons spin"
         style="display: inline-block"
-        >autorenew
+      >autorenew
       </i>
-      <span style="margin-top: 5px" v-show="results.length > 0">
+      <span
+        v-show="results.length > 0"
+        style="margin-top: 5px"
+      >
         {{ results.length }}
       </span>
     </div>
 
-    <div id="result" ref="result">
+    <div
+      id="result"
+      ref="result"
+    >
       <div>
         <template v-if="isEmpty">
           <p>{{ text }}</p>
@@ -43,12 +62,12 @@
               <h3>{{ $t("search.types") }}</h3>
               <div>
                 <div
-                  tabindex="0"
                   v-for="(v, k) in boxes"
                   :key="k"
+                  tabindex="0"
                   role="button"
-                  @click="init('type:' + k)"
                   :aria-label="$t('search.' + v.label)"
+                  @click="init('type:' + k)"
                 >
                   <i class="material-icons">{{ v.icon }}</i>
                   <p>{{ $t("search." + v.label) }}</p>
@@ -58,10 +77,22 @@
           </template>
         </template>
         <ul v-show="results.length > 0">
-          <li v-for="(s, k) in filteredResults" :key="k">
-            <router-link v-on:click="close" :to="s.url">
-              <i v-if="s.dir" class="material-icons">folder</i>
-              <i v-else class="material-icons">insert_drive_file</i>
+          <li
+            v-for="(s, k) in filteredResults"
+            :key="k"
+          >
+            <router-link
+              :to="s.url"
+              @click="close"
+            >
+              <i
+                v-if="s.dir"
+                class="material-icons"
+              >folder</i>
+              <i
+                v-else
+                class="material-icons"
+              >insert_drive_file</i>
               <span>./{{ s.path }}</span>
             </router-link>
           </li>
@@ -180,7 +211,10 @@ onUnmounted(() => {
 });
 
 const open = () => {
-  !active.value && layoutStore.showHover("search");
+  if (active.value) {
+    return;
+  }
+  layoutStore.showHover("search");
 };
 
 const close = (event: Event) => {
@@ -204,7 +238,9 @@ const keyup = (event: KeyboardEvent) => {
 
 const init = (string: string) => {
   prompt.value = `${string} `;
-  input.value !== null ? input.value.focus() : "";
+  if (input.value !== null) {
+    input.value.focus();
+  }
 };
 
 const reset = () => {

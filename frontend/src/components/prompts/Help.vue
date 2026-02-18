@@ -22,11 +22,11 @@
       <button
         id="focus-prompt"
         type="submit"
-        @click="closeHovers"
         class="button button--flat"
         :aria-label="$t('buttons.ok')"
         :title="$t('buttons.ok')"
         tabindex="1"
+        @click="closeHovers"
       >
         {{ $t("buttons.ok") }}
       </button>
@@ -39,7 +39,7 @@ import { mapActions } from "pinia";
 import { useLayoutStore } from "@/stores/layout";
 
 export default {
-  name: "help",
+  name: "Help",
   methods: {
     ...mapActions(useLayoutStore, ["closeHovers"]),
   },

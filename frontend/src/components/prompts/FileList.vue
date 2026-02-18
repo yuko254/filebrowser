@@ -2,25 +2,24 @@
   <div>
     <ul class="file-list">
       <li
-        @click="itemClick"
-        @touchstart="touchstart"
-        @dblclick="next"
+        v-for="item in items"
+        :key="item.name"
         role="button"
         tabindex="0"
         :aria-label="item.name"
         :aria-selected="selected == item.url"
-        :key="item.name"
-        v-for="item in items"
         :data-url="item.url"
         :data-isdir="item.isDir"
+        @click="itemClick"
+        @touchstart="touchstart"
+        @dblclick="next"
       >
         {{ item.name }}
       </li>
     </ul>
 
     <p>
-      {{ $t("prompts.currentlyNavigating") }} <code>{{ nav }}</code
-      >.
+      {{ $t("prompts.currentlyNavigating") }} <code>{{ nav }}</code>.
     </p>
   </div>
 </template>
@@ -36,7 +35,8 @@ import { files } from "@/api";
 import { StatusError } from "@/api/utils.js";
 
 export default {
-  name: "file-list",
+  name: "FileList",
+  inject: ["$showError"],
   props: {
     exclude: {
       type: Array,
@@ -68,7 +68,6 @@ export default {
       isSystem: false,
     };
   },
-  inject: ["$showError"],
   computed: {
     ...mapState(useAuthStore, ["user"]),
     ...mapState(useFileStore, ["req"]),
@@ -109,8 +108,15 @@ export default {
           let parentUrl = `/files${parent}`;
           if (!parentUrl.endsWith("/")) parentUrl += "/";
           // append system query so backend serves OS FS
-          parentUrl = parentUrl + (parentUrl.includes("?") ? "&system=true" : "?system=true");
-          this.items.push({ name: "..", url: parentUrl, isDir: true, system: true });
+          parentUrl =
+            parentUrl +
+            (parentUrl.includes("?") ? "&system=true" : "?system=true");
+          this.items.push({
+            name: "..",
+            url: parentUrl,
+            isDir: true,
+            system: true,
+          });
         }
       } else {
         this.isSystem = false;
