@@ -54,21 +54,6 @@ var (
 	warnedFlags = map[string]bool{}
 )
 
-// TODO(remove): remove after July 2026.
-func migrateFlagNames(_ *pflag.FlagSet, name string) pflag.NormalizedName {
-	if newName, ok := flagNamesMigrations[name]; ok {
-
-		if !warnedFlags[name] {
-			warnedFlags[name] = true
-			log.Printf("DEPRECATION NOTICE: Flag --%s has been deprecated, use --%s instead\n", name, newName)
-		}
-
-		name = newName
-	}
-
-	return pflag.NormalizedName(name)
-}
-
 func init() {
 	rootCmd.SilenceUsage = true
 	rootCmd.SetGlobalNormalizationFunc(migrateFlagNames)
@@ -92,6 +77,21 @@ func init() {
 	flags.String("redisCacheUrl", "", "redis cache URL (for multi-instance deployments), e.g. redis://user:pass@host:port")
 	flags.Int("imageProcessors", 4, "image processors count")
 	addServerFlags(flags)
+}
+
+// TODO(remove): remove after July 2026.
+func migrateFlagNames(_ *pflag.FlagSet, name string) pflag.NormalizedName {
+	if newName, ok := flagNamesMigrations[name]; ok {
+
+		if !warnedFlags[name] {
+			warnedFlags[name] = true
+			log.Printf("DEPRECATION NOTICE: Flag --%s has been deprecated, use --%s instead\n", name, newName)
+		}
+
+		name = newName
+	}
+
+	return pflag.NormalizedName(name)
 }
 
 // addServerFlags adds server related flags to the given FlagSet. These flags are available

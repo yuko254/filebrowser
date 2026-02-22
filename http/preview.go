@@ -8,11 +8,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"github.com/spf13/afero"
-	"github.com/gorilla/mux"
 	"os/exec"
+	"strings"
+
 	"github.com/filebrowser/filebrowser/v2/files"
 	"github.com/filebrowser/filebrowser/v2/img"
+	"github.com/gorilla/mux"
+	"github.com/spf13/afero"
 )
 
 /*
@@ -91,26 +93,130 @@ func handleVideoPreview(
 	}
 	if !ok {
 		sem <- 1
-		// cmd := exec.Command("ffmpeg", "-y", "-i", path, "-vf", "thumbnail,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=128:128", "-qscale:v", "25", "-frames:v", "1", tmp.Name())
-		stdout, err := exec.Command("ffmpeg", "-y", "-i", path, "-vf", "thumbnail,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=128:128", "-quality", "40", "-frames:v", "1", "-c:v", "webp", "-f", "image2pipe", "-").Output()
-		<- sem
+		defer func() { <-sem }()
+
+		// Define size and quality based on previewSize
+		var (
+			width, height int
+			quality       string
+		)
+
+		quality = "90"
+		switch previewSize {
+		case PreviewSizeThumb:
+			width, height = 256, 256
+		case PreviewSizeBig:
+			width, height = 1280, 720
+		default:
+			return http.StatusBadRequest, fmt.Errorf("unknown preview size")
+		}
+
+		// Build filter strings for GPU and software fallback
+		var gpuFilter, swFilter string
+		if previewSize == PreviewSizeThumb {
+			// Thumbnail: crop to square then scale
+			swFilter = fmt.Sprintf("thumbnail=n=300,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=%d:%d", width, height)
+			// GPU: select frame with thumbnail_cuda, download to CPU, then crop & scale (software)
+			gpuFilter = fmt.Sprintf("thumbnail_cuda=n=300,scale_cuda=%d:%d,hwdownload,format=nv12", width, height)
+		} else {
+			// Big preview: scale to fit within dimensions, preserving aspect ratio
+			swFilter = fmt.Sprintf("thumbnail=n=300,scale='min(%d\\,iw)':'min(%d\\,ih)'", width, height)
+			// GPU: pure GPU pipeline – select and scale on GPU, then download
+			gpuFilter = fmt.Sprintf("thumbnail_cuda=n=300,scale_cuda=%d:%d:force_original_aspect_ratio=decrease,hwdownload,format=nv12", width, height)
+		}
+
+		var stderr bytes.Buffer
+		var GPU bool
+		var CPU bool
+
+		// Attempt 1: GPU‑accelerated command
+		cmd := exec.Command("ffmpeg",
+			"-y",
+			"-hwaccel", "cuda",
+			"-hwaccel_output_format", "cuda",
+			"-skip_frame", "nokey",
+			"-ss", "5",
+			"-i", path,
+			"-vf", gpuFilter,
+			"-quality", quality,
+			"-frames:v", "1",
+			"-c:v", "webp",
+			"-f", "webp",
+			"-",
+		)
+		cmd.Stderr = &stderr
+		stdout, err := cmd.Output()
 		if err != nil {
-			return errToStatus(err), err
+			// GPU failed – fall back to software
+			lines := bytes.Split(stderr.Bytes(), []byte{'\n'})
+			lines = lines[len(lines)-10:]
+			cleanError := strings.TrimSpace(string(bytes.Join(lines, []byte{'\n'})))
+			fmt.Printf("GPU preview failed for %s : %v, used software fallback.\n\n", file.Path, cleanError)
+			GPU = false
+			stderr.Reset()
+		} else {
+			GPU = true
+		}
+
+		if !GPU {
+			// Attempt 2: Software fallback
+			cmd = exec.Command("ffmpeg",
+				"-y",
+				"-skip_frame", "nokey",
+				"-ss", "5",
+				"-i", path,
+				"-vf", swFilter,
+				"-quality", quality,
+				"-frames:v", "1",
+				"-c:v", "webp",
+				"-f", "webp",
+				"-",
+			)
+			cmd.Stderr = &stderr
+			stdout, err = cmd.Output()
+			if err != nil {
+				// software fallback failed - fallback to generous ffmpeg settings
+				lines := bytes.Split(stderr.Bytes(), []byte{'\n'})
+				lines = lines[len(lines)-10:]
+				cleanError := strings.TrimSpace(string(bytes.Join(lines, []byte{'\n'})))
+				fmt.Printf("CPU preview failed for %s : %v, used last fallback.\n\n", file.Path, cleanError)
+				CPU = false
+				stderr.Reset()
+			} else {
+				CPU = true
+			}
+		}
+		
+		if !CPU && !GPU {
+			// Attempt 3
+			filter := "thumbnail,crop=w='min(iw\\,ih)':h='min(iw\\,ih)',scale=256:256"
+			cmd = exec.Command("ffmpeg",
+				"-y",
+				"-i", path,
+				"-vf", filter,
+				"-quality", quality,
+				"-frames:v", "1",
+				"-c:v", "webp",
+				"-f", "webp",
+				"-",
+			)
+			cmd.Stderr = &stderr
+			stdout, err = cmd.Output()
+			if err != nil {
+				return errToStatus(err), err
+			}
 		}
 
 		resizedImage = stdout
 
 		go func() {
-			cacheKey := previewCacheKey(file, previewSize)
 			if err := fileCache.Store(context.Background(), cacheKey, resizedImage); err != nil {
 				fmt.Printf("failed to cache resized image: %v", err)
 			}
 		}()
-
 	}
 
 	w.Header().Set("Cache-Control", "private")
-	// w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Type", "image/webp")
 	http.ServeContent(w, r, "", file.ModTime, bytes.NewReader(resizedImage))
 	return 0, nil
